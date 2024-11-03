@@ -1,92 +1,123 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
+import React, { useRef } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, ScrollView, Animated } from 'react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
-export default function DailyPostureScreen() {
+const DailyPostureScreen = () => {
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const sunImageTranslate = scrollY.interpolate({
+    inputRange: [0, 200],
+    outputRange: [0, -50],
+    extrapolate: 'clamp',
+  });
+
+  const sunRingImageTranslate = scrollY.interpolate({
+    inputRange: [0, 200],
+    outputRange: [0, -30],
+    extrapolate: 'clamp',
+  });
+
   return (
     <View style={styles.container}>
-      {/* Sun Image */}
-      <Image source={require('../../assets/images/Sun1.png')} style={styles.sunImage} />
-      <Image source={require('../../assets/images/SunRing1.png')} style={styles.sunRingImage} />
+      <Animated.Image
+        source={require('../../assets/images/Sun1.png')}
+        style={[styles.sunImage, { transform: [{ translateY: sunImageTranslate }] }]}
+      />
+      <Animated.Image
+        source={require('../../assets/images/SunRing1.png')}
+        style={[styles.sunRingImage, { transform: [{ translateY: sunRingImageTranslate }] }]}
+      />
 
-      {/* Header */}
-      <Text style={styles.greeting}>Hello, Mariam</Text>
-      
-      {/* Title */}
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>Your Daily</Text>
-        <Text style={styles.title}>Posture</Text>
-      </View>
-      
-      {/* Main Content */}
-      <View style={styles.contentContainer}>
-        {/* Plant Card */}
-        <View style={styles.card}>
-          <Image source={require('../../assets/images/arrows.png')} style={styles.image2} />
-          <Image source={require('../../assets/images/plant.png')} style={styles.image} />
+      <Animated.ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        scrollEventThrottle={16}
+      >
+        {/* Header */}
+        <Text style={styles.greeting}>Hello, Mariam</Text>
+        
+        {/* Title */}
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Your Daily</Text>
+          <Text style={styles.title}>Posture</Text>
         </View>
+        
+        {/* Main Content */}
+        <View style={styles.contentContainer}>
+          {/* Plant Card */}
+          <View style={styles.card}>
+            <Image source={require('../../assets/images/arrows.png')} style={styles.image2} />
+            <Image source={require('../../assets/images/plant.png')} style={styles.image} />
+          </View>
 
-        {/* Sit Time Card */}
-        <View style={[styles.card, styles.sitTimeCard]}>
-          <Text style={styles.sitTimeText}>Sit Time</Text>
-          <Text style={styles.timeText}>
-            <Text style={styles.timeNumber}>120</Text>
-            <Text style={styles.timeUnit}> Min</Text>
-          </Text>
-          {/* Placeholder for pie chart */}
-          <View style={styles.pieChart}>
-            <Image source={require('../../assets/images/PieChart.png')} style={{ width: '100%', height: '100%' }} />
-          </View>
-          {/* Legend */}
-          <View style={styles.legendContainer}>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendCircle, { backgroundColor: '#347B20' }]} />
-              <Text style={styles.legendText}>Bloom</Text>
+          {/* Sit Time Card */}
+          <View style={[styles.card, styles.sitTimeCard]}>
+            <Text style={styles.sitTimeText}>Sit Time</Text>
+            <Text style={styles.timeText}>
+              <Text style={styles.timeNumber}>120</Text>
+              <Text style={styles.timeUnit}> Min</Text>
+            </Text>
+            {/* Placeholder for pie chart */}
+            <View style={styles.pieChart}>
+              <Image source={require('../../assets/images/PieChart.png')} style={{ width: '100%', height: '100%' }} />
             </View>
-            <View style={styles.legendItem}>
-              <View style={[styles.legendCircle, { backgroundColor: '#CD4947' }]} />
-              <Text style={styles.legendText}>Wilt</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Bloom Goal Card */}
-        <View style={[styles.card, styles.bloomGoalCard]}>
-          <View style={styles.bloomGoalHeader}>
-            <Text style={styles.bloomGoalText}>Today's Bloom Goal</Text>
-            <Image source={require('../../assets/images/Info.png')} style={styles.infoIcon} />
-          </View>
-          {/* <View style={styles.progressBarContainer}>
-            <Image source={require('../../assets/images/Progress.png')} style={styles.progressBar} />
-            <TouchableOpacity style={styles.setGoalButton}>
-              <Text style={styles.setGoalText}>+ Set Goal</Text>
-            </TouchableOpacity>
-          </View> */}
-          <View style={styles.motivationRow}>
-            <Image source={require('../../assets/images/Progress.png')} style={styles.progressBar} />
-            <View style={styles.motivationContainer}>
-              <Image source={require('../../assets/images/bulb.png')} style={styles.lightbulbImage} />
-              <Text style={styles.motivationText}>
-                you're{'\n'}
-                almost{'\n'}
-                there! keep{'\n'}
-                up the good{'\n'}
-                work
-              </Text>
+            {/* Legend */}
+            <View style={styles.legendContainer}>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendCircle, { backgroundColor: '#347B20' }]} />
+                <Text style={styles.legendText}>Bloom</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendCircle, { backgroundColor: '#CD4947' }]} />
+                <Text style={styles.legendText}>Wilt</Text>
+              </View>
             </View>
           </View>
+
+          {/* Bloom Goal Card */}
+          <View style={[styles.card, styles.bloomGoalCard]}>
+            <View style={styles.bloomGoalHeader}>
+              <Text style={styles.bloomGoalText}>Today's Bloom Goal</Text>
+              <Image source={require('../../assets/images/Info.png')} style={styles.infoIcon} />
+            </View>
+            {/* <View style={styles.progressBarContainer}>
+              <Image source={require('../../assets/images/Progress.png')} style={styles.progressBar} />
+              <TouchableOpacity style={styles.setGoalButton}>
+                <Text style={styles.setGoalText}>+ Set Goal</Text>
+              </TouchableOpacity>
+            </View> */}
+            <View style={styles.motivationRow}>
+              <Image source={require('../../assets/images/Progress.png')} style={styles.progressBar} />
+              <View style={styles.motivationContainer}>
+                <Image source={require('../../assets/images/bulb.png')} style={styles.lightbulbImage} />
+                <Text style={styles.motivationText}>
+                  you're{'\n'}
+                  almost{'\n'}
+                  there! keep{'\n'}
+                  up the good{'\n'}
+                  work
+                </Text>
+              </View>
+            </View>
+          </View>
         </View>
-      </View>
+      </Animated.ScrollView>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F9F9EE', // Light background color similar to image
     paddingHorizontal: 15,
+  },
+  scrollContainer: {
+    paddingBottom: 20,
   },
   sunImage: {
     position: 'absolute',
@@ -287,3 +318,5 @@ const styles = StyleSheet.create({
     marginBottom: 30, // Add marginBottom to create space
   },
 });
+
+export default DailyPostureScreen;

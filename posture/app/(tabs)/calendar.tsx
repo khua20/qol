@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, Image } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, Animated, FlatList } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 const PostureInsightsScreen = () => {
   const [selectedMonth, setSelectedMonth] = useState("January");
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   const daysOfWeek = ['S', 'M', 'T', 'W', 'TH', 'F', 'S'];
   const postureData = [
@@ -25,8 +26,8 @@ const PostureInsightsScreen = () => {
     return <View style={[styles.dayCircle, { backgroundColor: color }]} />;
   };
 
-  return (
-    <View style={styles.container}>
+  const renderHeader = () => (
+    <View style={styles.content}>
       <Text style={styles.header}>Posture Insights</Text>
 
       {/* Month Selector */}
@@ -72,29 +73,43 @@ const PostureInsightsScreen = () => {
             <Text key={`${day}-${index}`} style={styles.dayHeader}>{day}</Text>
           ))}
         </View>
-        <FlatList
-          data={postureData}
-          renderItem={renderDay}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={7}
-          columnWrapperStyle={{ justifyContent: 'space-around' }}
-        />
       </View>
+    </View>
+  );
 
-      {/* Monthly Breakdown */}
-      <View style={styles.breakdownCard}>
-        <TouchableOpacity style={[styles.navButton, styles.leftNavButton]}>
-          <Image source={require('../../assets/images/Left.png')} style={styles.navButtonImage} />
-        </TouchableOpacity>
-        <View style={styles.breakdownTitleContainer}>
-          <Text style={styles.breakdownTitle}>Monthly</Text>
-          <Text style={styles.breakdownTitle}>Breakdown</Text>
-        </View>
-        <TouchableOpacity style={[styles.navButton, styles.rightNavButton]}>
-          <Image source={require('../../assets/images/Right.png')} style={styles.navButtonImage} />
-        </TouchableOpacity>
-        <Image source={require('../../assets/images/lines.png')} style={styles.graphImage} />
+  const renderFooter = () => (
+    <View style={styles.breakdownCard}>
+      <TouchableOpacity style={[styles.navButton, styles.leftNavButton]}>
+        <Image source={require('../../assets/images/Left.png')} style={styles.navButtonImage} />
+      </TouchableOpacity>
+      <View style={styles.breakdownTitleContainer}>
+        <Text style={styles.breakdownTitle}>Monthly</Text>
+        <Text style={styles.breakdownTitle}>Breakdown</Text>
       </View>
+      <TouchableOpacity style={[styles.navButton, styles.rightNavButton]}>
+        <Image source={require('../../assets/images/Right.png')} style={styles.navButtonImage} />
+      </TouchableOpacity>
+      <Image source={require('../../assets/images/lines.png')} style={styles.graphImage} />
+    </View>
+  );
+
+  return (
+    <View style={styles.container}>
+      <Animated.FlatList
+        data={postureData}
+        renderItem={renderDay}
+        keyExtractor={(item, index) => index.toString()}
+        numColumns={7}
+        columnWrapperStyle={{ justifyContent: 'space-around' }}
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={renderFooter}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: true }
+        )}
+        scrollEventThrottle={16}
+        contentContainerStyle={styles.scrollContainer}
+      />
     </View>
   );
 };
@@ -102,8 +117,14 @@ const PostureInsightsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#F9F9EE',
+    padding: 15,
+  },
+  scrollContainer: {
+    paddingBottom: 20,
+  },
+  content: {
+    paddingHorizontal: 20,
   },
   header: {
     fontSize: 37,
@@ -111,12 +132,14 @@ const styles = StyleSheet.create({
     color: '#000',
     marginBottom: 15,
     marginTop: 80,
+    left: '-2%',
   },
   monthSelector: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 15,
+    left: '-5%',
   },
   pickerContainer: {
     flexDirection: 'row',
@@ -152,7 +175,7 @@ const styles = StyleSheet.create({
   },
   legendContainer: {
     flexDirection: 'row',
-    left: '-10%',
+    left: '-3%',
     marginTop: 5,
   },
   legendItem: {
@@ -175,9 +198,10 @@ const styles = StyleSheet.create({
   },
   daysOfWeekContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-between',
     width: '100%',
     marginBottom: 10,
+    left: '-50%',
   },
   dayHeader: {
     fontSize: 16,
@@ -197,7 +221,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#B9D8D5',
-    paddingVertical: 153, // Increase vertical padding to change height
+    paddingVertical: 155, // Increase vertical padding to change height
     paddingHorizontal: 20, // Keep horizontal padding the same
     borderRadius: 50,
     marginTop: 20,
