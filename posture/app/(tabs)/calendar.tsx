@@ -1,70 +1,270 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, FlatList, Image } from 'react-native';
+import RNPickerSelect from 'react-native-picker-select';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const { width: screenWidth } = Dimensions.get('window');
 
-export default function HomeScreen() {
+const PostureInsightsScreen = () => {
+  const [selectedMonth, setSelectedMonth] = useState("January");
+
+  const daysOfWeek = ['S', 'M', 'T', 'W', 'TH', 'F', 'S'];
+  const postureData = [
+    'Good', 'Ok', 'Ok', 'Bad', 'Good', 'Ok', 'Bad',
+    'None', 'None', 'None', 'None', 'None', 'None', 'None',
+    'None', 'None', 'None', 'None', 'None', 'None', 'None',
+    'None', 'None', 'None', 'None', 'None', 'None', 'None',
+  ];
+
+  const renderDay = ({ item }: { item: string }) => {
+    const color = {
+      'Good': '#48833C',
+      'Ok': '#A0CDC8',
+      'Bad': '#CD4947',
+      'None': '#D9D9D9'
+    }[item];
+    return <View style={[styles.dayCircle, { backgroundColor: color }]} />;
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <View style={styles.container}>
+      <Text style={styles.header}>Posture Insights</Text>
+
+      {/* Month Selector */}
+      <View style={styles.monthSelector}>
+        <View style={styles.pickerContainer}>
+          <View style={styles.calendarIconContainer}>
+            <Image source={require('../../assets/images/calendar.png')} style={styles.calendarIcon} />
+          </View>
+          <View style={styles.pickerWithArrow}>
+            <RNPickerSelect
+              value={selectedMonth}
+              onValueChange={(value) => setSelectedMonth(value)}
+              items={[
+                { label: 'January', value: 'January' },
+                { label: 'February', value: 'February' },
+                { label: 'March', value: 'March' },
+                { label: 'April', value: 'April' },
+                { label: 'May', value: 'May' },
+                { label: 'June', value: 'June' },
+                { label: 'July', value: 'July' },
+                { label: 'August', value: 'August' },
+                { label: 'September', value: 'September' },
+                { label: 'October', value: 'October' },
+                { label: 'November', value: 'November' },
+                { label: 'December', value: 'December' },
+              ]}
+              style={pickerSelectStyles}
+            />
+            <Image source={require('../../assets/images/down.png')} style={styles.downArrowIcon} />
+          </View>
+        </View>
+        <View style={styles.legendContainer}>
+          <View style={styles.legendItem}><View style={[styles.legendCircle, { backgroundColor: '#48833C' }]} /><Text style={styles.legendText}>Good</Text></View>
+          <View style={styles.legendItem}><View style={[styles.legendCircle, { backgroundColor: '#A0CDC8' }]} /><Text style={styles.legendText}>Ok</Text></View>
+          <View style={styles.legendItem}><View style={[styles.legendCircle, { backgroundColor: '#CD4947' }]} /><Text style={styles.legendText}>Bad</Text></View>
+        </View>
+      </View>
+
+      {/* Calendar */}
+      <View style={styles.calendarContainer}>
+        <View style={styles.daysOfWeekContainer}>
+          {daysOfWeek.map((day, index) => (
+            <Text key={`${day}-${index}`} style={styles.dayHeader}>{day}</Text>
+          ))}
+        </View>
+        <FlatList
+          data={postureData}
+          renderItem={renderDay}
+          keyExtractor={(item, index) => index.toString()}
+          numColumns={7}
+          columnWrapperStyle={{ justifyContent: 'space-around' }}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </View>
+
+      {/* Monthly Breakdown */}
+      <View style={styles.breakdownCard}>
+        <TouchableOpacity style={[styles.navButton, styles.leftNavButton]}>
+          <Image source={require('../../assets/images/Left.png')} style={styles.navButtonImage} />
+        </TouchableOpacity>
+        <View style={styles.breakdownTitleContainer}>
+          <Text style={styles.breakdownTitle}>Monthly</Text>
+          <Text style={styles.breakdownTitle}>Breakdown</Text>
+        </View>
+        <TouchableOpacity style={[styles.navButton, styles.rightNavButton]}>
+          <Image source={require('../../assets/images/Right.png')} style={styles.navButtonImage} />
+        </TouchableOpacity>
+        <Image source={require('../../assets/images/lines.png')} style={styles.graphImage} />
+      </View>
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: '#F9F9EE',
+  },
+  header: {
+    fontSize: 37,
+    fontWeight: '700',
+    color: '#000',
+    marginBottom: 15,
+    marginTop: 80,
+  },
+  monthSelector: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    justifyContent: 'space-between',
+    marginBottom: 15,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  pickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#CDE29B',
+    borderRadius: 30,
+    padding: 5,
+    height: 45,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  calendarIconContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 25,
+    padding: 5,
+    marginRight: -5,
+    left: -1,
+  },
+  calendarIcon: {
+    width: 30,
+    height: 30,
+    resizeMode: 'contain',
+  },
+  pickerWithArrow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  downArrowIcon: {
+    width: 33,
+    height: 33,
+    marginTop: 3,
+    marginLeft: -28,
+    resizeMode: 'contain',
+    fontFamily: 'Inter',
+  },
+  legendContainer: {
+    flexDirection: 'row',
+    left: '-10%',
+    marginTop: 5,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  legendCircle: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    marginRight: 5,
+  },
+  legendText: {
+    fontSize: 12,
+    fontWeight: '400',
+  },
+  calendarContainer: {
+    alignItems: 'center',
+  },
+  daysOfWeekContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginBottom: 10,
+  },
+  dayHeader: {
+    fontSize: 16,
+    width: (screenWidth - 40) / 7,
+    textAlign: 'center',
+    fontWeight: '800',
+    color: '#000',
+  },
+  dayCircle: {
+    width: (screenWidth - 80) / 7,
+    height: (screenWidth - 100) / 7,
+    borderRadius: 22,
+    margin: 6,
+  },
+  breakdownCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#B9D8D5',
+    paddingVertical: 153, // Increase vertical padding to change height
+    paddingHorizontal: 20, // Keep horizontal padding the same
+    borderRadius: 50,
+    marginTop: 20,
+    position: 'relative', // Ensure the container is positioned relative for absolute children
+  },
+  breakdownTitleContainer: {
+    alignItems: 'center',
+    position: 'absolute', // Position the container absolutely within the card
+    top: 10, // Adjust this value to move the title to the top
+    left: '50%',
+    transform: [{ translateX: -60 }], // Center the container horizontally
+  },
+  breakdownTitle: {
+    marginTop: 10,
+    fontSize: 32,
+    fontWeight: '600',
+    marginBottom: -15,
+  },
+  navButton: {
     position: 'absolute',
+    backgroundColor: '#fff',
+    width: 45,
+    height: 45,
+    borderRadius: 50,
+    alignItems: 'center',
+    justifyContent: 'center',
+    top: 25,
+  },
+  leftNavButton: {
+    left: 25, // Adjust this value to position the left button
+  },
+  rightNavButton: {
+    right: 25, // Adjust this value to position the right button
+  },
+  navButtonImage: {
+    width: 33,
+    height: 33,
+    resizeMode: 'contain',
+  },
+  graphImage: {
+    position: 'absolute',
+    top: 100, // Center the image vertically
+    left: '27.5%', // Center the image horizontally
+    transform: [{ translateX: -50 }, { translateY: -50 }], // Adjust the position to center the image
+    width: 300, // Adjust the width as needed
+    height: 300, // Adjust the height as needed
+    resizeMode: 'contain',
   },
 });
+
+const pickerSelectStyles = StyleSheet.create({
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 0, // Remove border
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderWidth: 0, // Remove border
+    color: 'black',
+    paddingRight: 30, // to ensure the text is never behind the icon
+  },
+});
+
+export default PostureInsightsScreen;
