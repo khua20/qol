@@ -1,70 +1,289 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const { width: screenWidth } = Dimensions.get('window');
 
-export default function HomeScreen() {
+export default function DailyPostureScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      {/* Sun Image */}
+      <Image source={require('../../assets/images/Sun1.png')} style={styles.sunImage} />
+      <Image source={require('../../assets/images/SunRing1.png')} style={styles.sunRingImage} />
+
+      {/* Header */}
+      <Text style={styles.greeting}>Hello, Mariam</Text>
+      
+      {/* Title */}
+      <View style={styles.titleContainer}>
+        <Text style={styles.title}>Your Daily</Text>
+        <Text style={styles.title}>Posture</Text>
+      </View>
+      
+      {/* Main Content */}
+      <View style={styles.contentContainer}>
+        {/* Plant Card */}
+        <View style={styles.card}>
+          <Image source={require('../../assets/images/arrows.png')} style={styles.image2} />
+          <Image source={require('../../assets/images/plant.png')} style={styles.image} />
+        </View>
+
+        {/* Sit Time Card */}
+        <View style={[styles.card, styles.sitTimeCard]}>
+          <Text style={styles.sitTimeText}>Sit Time</Text>
+          <Text style={styles.timeText}>
+            <Text style={styles.timeNumber}>120</Text>
+            <Text style={styles.timeUnit}> Min</Text>
+          </Text>
+          {/* Placeholder for pie chart */}
+          <View style={styles.pieChart}>
+            <Image source={require('../../assets/images/PieChart.png')} style={{ width: '100%', height: '100%' }} />
+          </View>
+          {/* Legend */}
+          <View style={styles.legendContainer}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendCircle, { backgroundColor: '#347B20' }]} />
+              <Text style={styles.legendText}>Bloom</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendCircle, { backgroundColor: '#CD4947' }]} />
+              <Text style={styles.legendText}>Wilt</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Bloom Goal Card */}
+        <View style={[styles.card, styles.bloomGoalCard]}>
+          <View style={styles.bloomGoalHeader}>
+            <Text style={styles.bloomGoalText}>Today's Bloom Goal</Text>
+            <Image source={require('../../assets/images/Info.png')} style={styles.infoIcon} />
+          </View>
+          {/* <View style={styles.progressBarContainer}>
+            <Image source={require('../../assets/images/Progress.png')} style={styles.progressBar} />
+            <TouchableOpacity style={styles.setGoalButton}>
+              <Text style={styles.setGoalText}>+ Set Goal</Text>
+            </TouchableOpacity>
+          </View> */}
+          <View style={styles.motivationRow}>
+            <Image source={require('../../assets/images/Progress.png')} style={styles.progressBar} />
+            <View style={styles.motivationContainer}>
+              <Image source={require('../../assets/images/bulb.png')} style={styles.lightbulbImage} />
+              <Text style={styles.motivationText}>
+                you're{'\n'}
+                almost{'\n'}
+                there! keep{'\n'}
+                up the good{'\n'}
+                work
+              </Text>
+            </View>
+          </View>
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F9F9EE', // Light background color similar to image
+    paddingHorizontal: 15,
+  },
+  sunImage: {
+    position: 'absolute',
+    top: 0,
+    right: -32,
+    width: 200,
+    height: 170,
+    resizeMode: 'contain',
+  },
+  sunRingImage: {
+    position: 'absolute',
+    top: -10, // Adjust this value to position the sunRing relative to the sunImage
+    right: -42, // Adjust this value to position the sunRing relative to the sunImage
+    width: 223, // Adjust the size as needed
+    height: 190, // Adjust the size as needed
+    resizeMode: 'contain',
+  },
+  greeting: {
+    marginTop: 60,
+    fontSize: 20,
+    color: '#000',
+    fontWeight: 'bold',
+    fontFamily: 'Inter',
+    left: '6%',
+  },
   titleContainer: {
+    paddingVertical: 20,
+    marginBottom: 0,
+  },
+  title: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: -10,
+    fontFamily: 'Inter',
+    left: '6%',
+  },
+  contentContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 10,
+  },
+  card: {
+    width: screenWidth * 0.567,
+    backgroundColor: '#D8C09A',
+    borderRadius: 50,
+    alignItems: 'center',
+    fontFamily: 'Inter',
+    height: 243,
+  },
+  sitTimeCard: {
+    paddingVertical: 15,
+    backgroundColor: '#B9D8D5',
+    width: screenWidth * 0.33,
+  },
+  bloomGoalCard: {
+    width: '100%',
+    height: '65%',
+    backgroundColor: '#CDE29B',
+    paddingBottom: 10,
+  },
+  bloomGoalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  infoIcon: {
+    width: 21,
+    height: 21,
+    marginLeft: 5,
+    marginTop: 20, // Adjust this value to move the icon down
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
+  progressBarContainer: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  progressBar: {
+    width: '65%',
+    height: '110%',
+    resizeMode: 'contain',
+  },
+  // setGoalButton: {
+  //   position: 'absolute',
+  //   backgroundColor: '#ffffff',
+  //   paddingHorizontal: 20,
+  //   paddingVertical: 10,
+  //   borderRadius: 20,
+  // },
+  // setGoalText: {
+  //   fontSize: 16,
+  //   color: '#000',
+  //   fontWeight: 'bold',
+  //   fontFamily: 'Inter-Regular',
+  // },
+  image: {
+    width: '140%',
+    height: '105%',
+    resizeMode: 'contain',
     position: 'absolute',
+    top: -25,
+    left: '50%',
+    transform: [{ translateX: -188 }],
+  },
+  image2: {
+    width: '75%',
+    height: '75%',
+    resizeMode: 'contain',
+    position: 'absolute',
+    top: 10,
+    left: '34%',
+    transform: [{ translateX: -50 }],
+  },
+  sitTimeText: {
+    fontSize: 17,
+    fontWeight: '600',
+    fontFamily: 'Inter',
+    marginBottom: 8, // Add marginBottom to create space below "Sit Time"
+  },
+  timeText: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#000',
+    fontFamily: 'Inter',
+  },
+  timeNumber: {
+    fontSize: 45,
+    fontWeight: '600',
+    color: '#000',
+    fontFamily: 'Inter',
+  },
+  timeUnit: {
+    fontSize: 12,
+    fontWeight: '400',
+    color: '#000',
+    fontFamily: 'Inter',
+  },
+  pieChart: {
+    width: 95,
+    height: 95,
+    borderRadius: 60,
+    marginTop: 5,
+  },
+  legendContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: 2,
+  },
+  legendCircle: {
+    width: 11,
+    height: 11,
+    borderRadius: 5.5,
+    marginRight: 3,
+  },
+  legendText: {
+    fontSize: 10,
+    color: '#000',
+    fontFamily: 'Inter',
+  },
+  bloomGoalText: {
+    fontSize: 25,
+    fontWeight: '600',
+    fontFamily: 'Inter',
+    marginTop: '5.5%',
+    marginLeft: '-23%',
+  },
+  motivationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: '8%',
+    left: '-4%',
+  },
+  motivationContainer: {
+    backgroundColor: '#ffffff',
+    padding: 10,
+    borderRadius: 30,
+    marginLeft: 8, // Add marginLeft to create space between the image and text
+    alignItems: 'center', // Center align the children vertically
+    width: '27%',
+    height: '105%',
+  },
+  lightbulbImage: {
+    width: 31,
+    height: 33,
+    marginBottom: 20, // Add marginBottom to create space between the image and text
+    marginTop: 7, // Add marginTop to create space between the image and text
+  },
+  motivationText: {
+    color: '#000',
+    fontSize: 14,
+    textAlign: 'left',
+    fontFamily: 'Inter',
+    marginBottom: 30, // Add marginBottom to create space
   },
 });
