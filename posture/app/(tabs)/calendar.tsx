@@ -6,15 +6,17 @@ const { width: screenWidth } = Dimensions.get('window');
 
 const PostureInsightsScreen = () => {
   const [selectedMonth, setSelectedMonth] = useState("January");
-  const scrollY = useRef(new Animated.Value(0)).current;
-
-  const daysOfWeek = ['S', 'M', 'T', 'W', 'TH', 'F', 'S'];
-  const postureData = [
+  const [postureData, setPostureData] = useState([
     'Good', 'Ok', 'Ok', 'Bad', 'Good', 'Ok', 'Bad',
     'None', 'None', 'None', 'None', 'None', 'None', 'None',
     'None', 'None', 'None', 'None', 'None', 'None', 'None',
     'None', 'None', 'None', 'None', 'None', 'None', 'None',
-  ];
+  ]);
+  const pickerRef = useRef<RNPickerSelect>(null);
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const daysOfWeek = ['S', 'M', 'T', 'W', 'TH', 'F', 'S'];
+  const monthsAbbreviated = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   const renderDay = ({ item }: { item: string }) => {
     const color = {
@@ -32,14 +34,30 @@ const PostureInsightsScreen = () => {
 
       {/* Month Selector */}
       <View style={styles.monthSelector}>
-        <View style={styles.pickerContainer}>
+        <TouchableOpacity
+          style={[styles.pickerContainer, { width: selectedMonth.length * 10 + 90 }]} // Adjust width based on selected month
+          onPress={() => pickerRef.current?.togglePicker()}
+        >
           <View style={styles.calendarIconContainer}>
             <Image source={require('../../assets/images/calendar.png')} style={styles.calendarIcon} />
           </View>
           <View style={styles.pickerWithArrow}>
             <RNPickerSelect
+              ref={pickerRef}
               value={selectedMonth}
-              onValueChange={(value) => setSelectedMonth(value)}
+              onValueChange={(value) => {
+                setSelectedMonth(value);
+                if (value !== 'January') {
+                  setPostureData(Array(28).fill('None'));
+                } else {
+                  setPostureData([
+                    'Good', 'Ok', 'Ok', 'Bad', 'Good', 'Ok', 'Bad',
+                    'None', 'None', 'None', 'None', 'None', 'None', 'None',
+                    'None', 'None', 'None', 'None', 'None', 'None', 'None',
+                    'None', 'None', 'None', 'None', 'None', 'None', 'None',
+                  ]);
+                }
+              }}
               items={[
                 { label: 'January', value: 'January' },
                 { label: 'February', value: 'February' },
@@ -54,15 +72,28 @@ const PostureInsightsScreen = () => {
                 { label: 'November', value: 'November' },
                 { label: 'December', value: 'December' },
               ]}
+              placeholder={{}}
               style={pickerSelectStyles}
+              useNativeAndroidPickerStyle={false}
+              Icon={() => {
+                return <Image source={require('../../assets/images/down.png')} style={styles.downArrowIcon} />;
+              }}
             />
-            <Image source={require('../../assets/images/down.png')} style={styles.downArrowIcon} />
           </View>
-        </View>
+        </TouchableOpacity>
         <View style={styles.legendContainer}>
-          <View style={styles.legendItem}><View style={[styles.legendCircle, { backgroundColor: '#48833C' }]} /><Text style={styles.legendText}>Good</Text></View>
-          <View style={styles.legendItem}><View style={[styles.legendCircle, { backgroundColor: '#A0CDC8' }]} /><Text style={styles.legendText}>Ok</Text></View>
-          <View style={styles.legendItem}><View style={[styles.legendCircle, { backgroundColor: '#CD4947' }]} /><Text style={styles.legendText}>Bad</Text></View>
+          <View style={[styles.legendItem]}>
+            <View style={[styles.legendCircle, { backgroundColor: '#48833C' }]} />
+            <Text style={styles.legendText}>Good</Text>
+          </View>
+          <View style={[styles.legendItem]}>
+            <View style={[styles.legendCircle, { backgroundColor: '#A0CDC8' }]} />
+            <Text style={styles.legendText}>Ok</Text>
+          </View>
+          <View style={[styles.legendItem]}>
+            <View style={[styles.legendCircle, { backgroundColor: '#CD4947' }]} />
+            <Text style={styles.legendText}>Bad</Text>
+          </View>
         </View>
       </View>
 
@@ -79,17 +110,16 @@ const PostureInsightsScreen = () => {
 
   const renderFooter = () => (
     <View style={styles.breakdownCard}>
-      <TouchableOpacity style={[styles.navButton, styles.leftNavButton]}>
-        <Image source={require('../../assets/images/Left.png')} style={styles.navButtonImage} />
-      </TouchableOpacity>
       <View style={styles.breakdownTitleContainer}>
         <Text style={styles.breakdownTitle}>Monthly</Text>
         <Text style={styles.breakdownTitle}>Breakdown</Text>
       </View>
-      <TouchableOpacity style={[styles.navButton, styles.rightNavButton]}>
-        <Image source={require('../../assets/images/Right.png')} style={styles.navButtonImage} />
-      </TouchableOpacity>
       <Image source={require('../../assets/images/lines.png')} style={styles.graphImage} />
+      <View style={styles.monthsContainer}>
+        {monthsAbbreviated.map((month, index) => (
+          <Text key={index} style={styles.monthText}>{month}</Text>
+        ))}
+      </View>
     </View>
   );
 
@@ -139,7 +169,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 15,
-    left: '-5%',
+    left: '-3%',
   },
   pickerContainer: {
     flexDirection: 'row',
@@ -169,9 +199,9 @@ const styles = StyleSheet.create({
     width: 33,
     height: 33,
     marginTop: 3,
-    marginLeft: -28,
     resizeMode: 'contain',
     fontFamily: 'Inter',
+    left: 10,
   },
   legendContainer: {
     flexDirection: 'row',
@@ -201,7 +231,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     width: '100%',
     marginBottom: 10,
-    left: '-50%',
+    left: '-4%',
   },
   dayHeader: {
     fontSize: 16,
@@ -214,14 +244,14 @@ const styles = StyleSheet.create({
     width: (screenWidth - 80) / 7,
     height: (screenWidth - 100) / 7,
     borderRadius: 22,
-    margin: 6,
+    margin: 3.7,
   },
   breakdownCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#B9D8D5',
-    paddingVertical: 155, // Increase vertical padding to change height
+    paddingVertical: 104, // Increase vertical padding to change height
     paddingHorizontal: 20, // Keep horizontal padding the same
     borderRadius: 50,
     marginTop: 20,
@@ -236,9 +266,10 @@ const styles = StyleSheet.create({
   },
   breakdownTitle: {
     marginTop: 10,
-    fontSize: 32,
+    fontSize: 35,
     fontWeight: '600',
     marginBottom: -15,
+    left: '-2%',
   },
   navButton: {
     position: 'absolute',
@@ -267,8 +298,21 @@ const styles = StyleSheet.create({
     left: '27.5%', // Center the image horizontally
     transform: [{ translateX: -50 }, { translateY: -50 }], // Adjust the position to center the image
     width: 300, // Adjust the width as needed
-    height: 300, // Adjust the height as needed
+    height: 310, // Adjust the height as needed
     resizeMode: 'contain',
+  },
+  monthsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '84%',
+    top: 58,
+    marginTop: 100,
+    left: '7.5%',
+  },
+  monthText: {
+    fontSize: 11,
+    fontWeight: '400',
+    color: '#000',
   },
 });
 

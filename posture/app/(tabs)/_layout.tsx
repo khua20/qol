@@ -69,14 +69,14 @@ const styles = StyleSheet.create({
   tabBar: {
     position: 'absolute',
     bottom: '2%',
-    width: '50%', // Adjusted width to fit icons properly
+    width: '48%', // Adjusted width to fit icons properly
     height: '6.2%', 
     borderRadius: 30,
     backgroundColor: '#404040',
     paddingBottom: 0, // Adjust padding to avoid clipping
     paddingTop: 10, // Adjust padding to avoid clipping
-    left: '25%', // Move to the center of the screen
     top: '90%', // Move to the bottom of the screen
+    marginLeft: '25%', // Center the tab bar
   },
   tabBarItem: {
     marginTop: 0, // Remove top margin to avoid clipping
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 5, // Move the icons down
+    marginTop: -10, // Move the icons down
   },
   iconContainerFocused: {
     backgroundColor: 'white',

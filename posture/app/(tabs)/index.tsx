@@ -84,14 +84,14 @@ const DailyPostureScreen = () => {
               <Text style={styles.bloomGoalText}>Today's Bloom Goal</Text>
               <Image source={require('../../assets/images/Info.png')} style={styles.infoIcon} />
             </View>
-            {/* <View style={styles.progressBarContainer}>
-              <Image source={require('../../assets/images/Progress.png')} style={styles.progressBar} />
-              <TouchableOpacity style={styles.setGoalButton}>
-                <Text style={styles.setGoalText}>+ Set Goal</Text>
-              </TouchableOpacity>
-            </View> */}
             <View style={styles.motivationRow}>
-              <Image source={require('../../assets/images/Progress.png')} style={styles.progressBar} />
+              <View style={styles.progressBarContainer}>
+                <Image source={require('../../assets/images/dash.png')} style={styles.progressBar} />
+                <TouchableOpacity style={styles.setGoalButton}>
+                  <Image source={require('../../assets/images/plus.png')} style={styles.plusIcon} />
+                  <Text style={styles.setGoalText}>Set Goal</Text>
+                </TouchableOpacity>
+              </View>
               <View style={styles.motivationContainer}>
                 <Image source={require('../../assets/images/bulb.png')} style={styles.lightbulbImage} />
                 <Text style={styles.motivationText}>
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   greeting: {
-    marginTop: 60,
+    marginTop: 70,
     fontSize: 20,
     color: '#000',
     fontWeight: 'bold',
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
   bloomGoalCard: {
     width: '100%',
-    height: '65%',
+    height: '62%',
     backgroundColor: '#CDE29B',
     paddingBottom: 10,
   },
@@ -194,25 +194,32 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
+    width: '100%', // Ensure the container takes the full width
+    height: 50,
+    left: '2%',
   },
   progressBar: {
-    width: '65%',
-    height: '110%',
+    width: '250%',
+    height: '420%',
     resizeMode: 'contain',
   },
-  // setGoalButton: {
-  //   position: 'absolute',
-  //   backgroundColor: '#ffffff',
-  //   paddingHorizontal: 20,
-  //   paddingVertical: 10,
-  //   borderRadius: 20,
-  // },
-  // setGoalText: {
-  //   fontSize: 16,
-  //   color: '#000',
-  //   fontWeight: 'bold',
-  //   fontFamily: 'Inter-Regular',
-  // },
+  setGoalButton: {
+    position: 'absolute',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 7,
+    paddingVertical: 12,
+    borderRadius: 30,
+    alignSelf: 'center', // Center the button horizontally
+  },
+  setGoalText: {
+    fontSize: 15,
+    color: '#000',
+    fontWeight: '400',
+    fontFamily: 'Inter-Regular',
+    left: '-1%',
+  },
   image: {
     width: '140%',
     height: '105%',
@@ -293,7 +300,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: '8%',
-    left: '-4%',
+    left: '-3%',
   },
   motivationContainer: {
     backgroundColor: '#ffffff',
@@ -301,8 +308,9 @@ const styles = StyleSheet.create({
     borderRadius: 30,
     marginLeft: 8, // Add marginLeft to create space between the image and text
     alignItems: 'center', // Center align the children vertically
-    width: '27%',
+    width: '29%',
     height: '105%',
+    left: '-18%',
   },
   lightbulbImage: {
     width: 31,
@@ -316,6 +324,13 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     fontFamily: 'Inter',
     marginBottom: 30, // Add marginBottom to create space
+  },
+  plusIcon: {
+    width: 25,
+    height: 25,
+    fontWeight: '400',
+    marginRight: 9,
+    left: 0,
   },
 });
 
