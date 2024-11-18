@@ -1,9 +1,13 @@
-import React, { useRef } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, ScrollView, Animated } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, ScrollView, Animated, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 const DailyPostureScreen = () => {
+  const [goalInputVisible, setGoalInputVisible] = useState(false);
+  const [goal, setGoal] = useState('');
+  const [goalText, setGoalText] = useState('Set Goal');
+  const [goalSet, setGoalSet] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const sunImageTranslate = scrollY.interpolate({
@@ -18,8 +22,21 @@ const DailyPostureScreen = () => {
     extrapolate: 'clamp',
   });
 
+  const handleSetGoalPress = () => {
+    setGoalInputVisible(true);
+  };
+
+  const handleGoalSubmit = () => {
+    setGoalText(`0/${goal}`);
+    setGoalSet(true);
+    setGoalInputVisible(false);
+  };
+
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
       <Animated.Image
         source={require('../../assets/images/Sun1.png')}
         style={[styles.sunImage, { transform: [{ translateY: sunImageTranslate }] }]}
@@ -58,12 +75,13 @@ const DailyPostureScreen = () => {
           <View style={[styles.card, styles.sitTimeCard]}>
             <Text style={styles.sitTimeText}>Sit Time</Text>
             <Text style={styles.timeText}>
-              <Text style={styles.timeNumber}>120</Text>
+              <Text style={styles.timeNumber}>0</Text>
               <Text style={styles.timeUnit}> Min</Text>
             </Text>
             {/* Placeholder for pie chart */}
             <View style={styles.pieChart}>
-              <Image source={require('../../assets/images/PieChart.png')} style={{ width: '100%', height: '100%' }} />
+              <View style={styles.filledcircle}></View>
+              {/* <Image source={require('../../assets/images/PieChart.png')} style={{ width: '100%', height: '100%' }} /> */}
             </View>
             {/* Legend */}
             <View style={styles.legendContainer}>
@@ -82,15 +100,45 @@ const DailyPostureScreen = () => {
           <View style={[styles.card, styles.bloomGoalCard]}>
             <View style={styles.bloomGoalHeader}>
               <Text style={styles.bloomGoalText}>Today's Bloom Goal</Text>
-              <Image source={require('../../assets/images/Info.png')} style={styles.infoIcon} />
+              {/* <Image source={require('../../assets/images/Info.png')} style={styles.infoIcon} /> */}
             </View>
             <View style={styles.motivationRow}>
               <View style={styles.progressBarContainer}>
-                <Image source={require('../../assets/images/dash.png')} style={styles.progressBar} />
-                <TouchableOpacity style={styles.setGoalButton}>
-                  <Image source={require('../../assets/images/plus.png')} style={styles.plusIcon} />
-                  <Text style={styles.setGoalText}>Set Goal</Text>
-                </TouchableOpacity>
+                {goalSet ? (
+                  <View style={styles.circle}></View>
+                ) : (
+                  <Image source={require('../../assets/images/dash.png')} style={styles.progressBar} />
+                )}
+                {goalInputVisible ? (
+                  <View style={styles.goalInputContainer}>
+                    <Text style={styles.goalInputLabel}>How many minutes would you like to have good posture today?</Text>
+                    <View style={styles.goalInputRow}>
+                      <TextInput
+                        style={styles.goalInput}
+                        keyboardType="numeric"
+                        value={goal}
+                        onChangeText={setGoal}
+                        placeholder=""
+                        placeholderTextColor="#999"
+                      />
+                      <TouchableOpacity style={styles.submitButton} onPress={handleGoalSubmit}>
+                        <Image source={require('../../assets/images/check2.png')} style={styles.checkIcon} />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ) : (
+                  goalSet ? (
+                    <View style={styles.goalTextContainer}>
+                      <Text style={styles.goalText}>{goalText}</Text>
+                      <Text style={styles.minutesText}>Minutes</Text>
+                    </View>
+                  ) : (
+                    <TouchableOpacity style={styles.setGoalButton} onPress={handleSetGoalPress}>
+                      <Image source={require('../../assets/images/plus.png')} style={styles.plusIcon} />
+                      <Text style={styles.setGoalText}>Set Goal</Text>
+                    </TouchableOpacity>
+                  )
+                )}
               </View>
               <View style={styles.motivationContainer}>
                 <Image source={require('../../assets/images/bulb.png')} style={styles.lightbulbImage} />
@@ -106,7 +154,7 @@ const DailyPostureScreen = () => {
           </View>
         </View>
       </Animated.ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -199,6 +247,8 @@ const styles = StyleSheet.create({
     left: '2%',
   },
   progressBar: {
+    position: 'absolute',
+    top: -80,
     width: '250%',
     height: '420%',
     resizeMode: 'contain',
@@ -219,6 +269,71 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     fontFamily: 'Inter-Regular',
     left: '-1%',
+  },
+  goalInputContainer: {
+    position: 'absolute',
+    top: -33,
+    width: '30%',
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 115,
+  },
+  goalInputLabel: {
+    fontSize: 9,
+    color: '#000',
+    marginBottom: 10,
+  },
+  goalInputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  goalInput: {
+    width: 60,
+    height: 38,
+    borderRadius: 10,
+    paddingHorizontal: 1,
+    marginRight: 6,
+    backgroundColor: '#D9D9D9',
+    textAlign: 'center',
+    fontSize: 24, // Set the font size
+    fontWeight: '500', // Set the font weight
+  },
+  submitButton: {
+    backgroundColor: '#D9D9D9',
+    height: 33,
+    width: 33,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  checkIcon: {
+    width: 20,
+    height: 20,
+    resizeMode: 'contain',
+  },
+  goalTextContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    top: 0,
+  },
+  goalText: {
+    fontSize: 28,
+    color: '#000',
+    fontWeight: '600',
+    // fontFamily: 'Inter-Bold',
+    textAlign: 'center', // Center align the text
+  },
+  minutesText: {
+    fontSize: 13,
+    color: '#000',
+    fontWeight: '400',
+    fontFamily: 'Inter-Regular',
+    textAlign: 'center', // Center align the text
+    marginTop: 3, // Adjust this value to move the text up
   },
   image: {
     width: '140%',
@@ -294,7 +409,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontFamily: 'Inter',
     marginTop: '5.5%',
-    marginLeft: '-23%',
+    marginLeft: '-2%',
   },
   motivationRow: {
     flexDirection: 'row',
@@ -332,6 +447,21 @@ const styles = StyleSheet.create({
     marginRight: 9,
     left: 0,
   },
+  circle: {
+    position: 'absolute',
+    width: 220,
+    height: 220,
+    borderRadius: 1000,
+    borderWidth: 25,
+    borderColor: '#00000033',
+  },
+  filledcircle: {
+    width: 90,
+    height: 90,
+    borderRadius: 1000,
+    backgroundColor: '#FFFFFF99',
+    left: 2,
+  }
 });
 
 export default DailyPostureScreen;
