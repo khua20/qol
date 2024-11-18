@@ -1,5 +1,6 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, ScrollView, Animated, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
+import AnimatedCircleProgress from '../../components/AnimatedCircleProgress'; // Adjust the path as necessary
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -8,6 +9,8 @@ const DailyPostureScreen = () => {
   const [goal, setGoal] = useState('');
   const [goalText, setGoalText] = useState('Set Goal');
   const [goalSet, setGoalSet] = useState(false);
+  const [currentGoal, setCurrentGoal] = useState(0);
+  const [isIncrementing, setIsIncrementing] = useState(true);
   const scrollY = useRef(new Animated.Value(0)).current;
 
   const sunImageTranslate = scrollY.interpolate({
@@ -26,10 +29,40 @@ const DailyPostureScreen = () => {
     setGoalInputVisible(true);
   };
 
-  const handleGoalSubmit = () => {
+  const handleGoalSubmit1 = () => {
     setGoalText(`0/${goal}`);
     setGoalSet(true);
     setGoalInputVisible(false);
+  };
+
+  const handleGoalSubmit = () => {
+    setGoalSet(true);
+    setGoalInputVisible(false);
+
+    const goalValue = parseInt(goal, 10);
+    const interval = setInterval(() => {
+      setCurrentGoal((prevGoal) => {
+        if (isIncrementing) {
+          if (prevGoal < goalValue) {
+            setGoalText(`${prevGoal + 1}/${goal}`);
+            return prevGoal + 1;
+          } else {
+            setIsIncrementing(false);
+            clearInterval(interval);
+            return prevGoal;
+          }
+        } else {
+          if (prevGoal > 0) {
+            setGoalText(`${prevGoal - 1}/${goal}`);
+            return prevGoal - 1;
+          } else {
+            setIsIncrementing(true);
+            clearInterval(interval);
+            return prevGoal;
+          }
+        }
+      });
+    }, 10); // Adjust the interval time as needed
   };
 
   return (
@@ -105,7 +138,7 @@ const DailyPostureScreen = () => {
             <View style={styles.motivationRow}>
               <View style={styles.progressBarContainer}>
                 {goalSet ? (
-                  <View style={styles.circle}></View>
+                  <AnimatedCircleProgress onPress={handleGoalSubmit}/>
                 ) : (
                   <Image source={require('../../assets/images/dash.png')} style={styles.progressBar} />
                 )}
@@ -121,7 +154,7 @@ const DailyPostureScreen = () => {
                         placeholder=""
                         placeholderTextColor="#999"
                       />
-                      <TouchableOpacity style={styles.submitButton} onPress={handleGoalSubmit}>
+                      <TouchableOpacity style={styles.submitButton} onPress={handleGoalSubmit1}>
                         <Image source={require('../../assets/images/check2.png')} style={styles.checkIcon} />
                       </TouchableOpacity>
                     </View>
@@ -130,7 +163,7 @@ const DailyPostureScreen = () => {
                   goalSet ? (
                     <View style={styles.goalTextContainer}>
                       <Text style={styles.goalText}>{goalText}</Text>
-                      <Text style={styles.minutesText}>Minutes</Text>
+                      <Text style={styles.minutesText}>Minutes Bloom</Text>
                     </View>
                   ) : (
                     <TouchableOpacity style={styles.setGoalButton} onPress={handleSetGoalPress}>
@@ -461,7 +494,7 @@ const styles = StyleSheet.create({
     borderRadius: 1000,
     backgroundColor: '#FFFFFF99',
     left: 2,
-  }
+  },
 });
 
 export default DailyPostureScreen;
