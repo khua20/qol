@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Animated, Dimensions, ScrollView, Modal } from 'react-native';
 import Slider from '@react-native-community/slider';
+import { useNavigation } from '@react-navigation/native';
 
 interface ToggleSwitchProps {
   isOn: boolean;
@@ -28,10 +29,11 @@ const SettingsScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedTime, setSelectedTime] = useState('1 min');
   const animation = useRef(new Animated.Value(0)).current;
+  const navigation = useNavigation<any>();
 
   const toggleExpand = (item: string): void => {
     if (item === 'logout') {
-      // Do nothing for logout
+      handleLogout();
       return;
     }
     if (expandedItem === item) {
@@ -48,6 +50,11 @@ const SettingsScreen = () => {
         useNativeDriver: false,
       }).start();
     }
+  };
+
+  const handleLogout = () => {
+    // Perform any logout logic here if needed
+    navigation.navigate('intro');
   };
 
   const handleVibrateToggle = () => {
@@ -82,15 +89,6 @@ const SettingsScreen = () => {
         />
         <View style={styles.profileInfo}>
           <Text style={styles.profileName}>Mariam Jalloh</Text>
-          {/* <TouchableOpacity style={styles.editButton}>
-            <View style={styles.editButtonContent}>
-              <Image
-                source={require('../../assets/images/pencil.png')}
-                style={styles.pencilIcon}
-              />
-              <Text style={styles.editButtonText}>Edit Account</Text>
-            </View>
-          </TouchableOpacity> */}
         </View>
       </View>
 
@@ -184,11 +182,11 @@ const SettingsScreen = () => {
             </View>
             {remindersOn && (
               <View style={styles.dropdownItem}>
-              <Text style={styles.dropdownText2}>Notify every</Text>
-              <TouchableOpacity style={styles.timeButton} onPress={() => setModalVisible(true)}>
-                <Text style={styles.timeButtonText}>{selectedTime}</Text>
-              </TouchableOpacity>
-            </View>
+                <Text style={styles.dropdownText2}>Notify every</Text>
+                <TouchableOpacity style={styles.timeButton} onPress={() => setModalVisible(true)}>
+                  <Text style={styles.timeButtonText}>{selectedTime}</Text>
+                </TouchableOpacity>
+              </View>
             )}
           </View>
         )}
@@ -214,7 +212,7 @@ const SettingsScreen = () => {
             </View>
           </View>
         )}
-        <TouchableOpacity style={styles.settingsItem1} onPress={() => toggleExpand('logout')}>
+        <TouchableOpacity style={styles.settingsItem1} onPress={handleLogout}>
           <View style={styles.settingsItemContent}>
             <Image
               source={require('../../assets/images/log.png')}

@@ -1,8 +1,14 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, ScrollView, Animated, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import AnimatedCircleProgress from '../../components/AnimatedCircleProgress'; // Adjust the path as necessary
 
 const { width: screenWidth } = Dimensions.get('window');
+
+const plantImages = [
+  require('../../assets/images/plant.png'),
+  require('../../assets/images/plant2.png'),
+  require('../../assets/images/plant3.png'),
+];
 
 const DailyPostureScreen = () => {
   const [goalInputVisible, setGoalInputVisible] = useState(false);
@@ -11,7 +17,16 @@ const DailyPostureScreen = () => {
   const [goalSet, setGoalSet] = useState(false);
   const [currentGoal, setCurrentGoal] = useState(0);
   const [isIncrementing, setIsIncrementing] = useState(true);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % plantImages.length);
+  //   }, 2000); // Change image every 2 seconds
+
+  //   return () => clearInterval(interval);
+  // }, []);
 
   const sunImageTranslate = scrollY.interpolate({
     inputRange: [0, 200],
@@ -65,6 +80,19 @@ const DailyPostureScreen = () => {
     }, 10); // Adjust the interval time as needed
   };
 
+  const getImageStyle = () => {
+    switch (currentImageIndex) {
+      case 0:
+        return styles.image;
+      case 1:
+        return styles.image1;
+      case 2:
+        return styles.image2;
+      default:
+        return styles.image;
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -100,8 +128,8 @@ const DailyPostureScreen = () => {
         <View style={styles.contentContainer}>
           {/* Plant Card */}
           <View style={styles.card}>
-            <Image source={require('../../assets/images/arrows.png')} style={styles.image2} />
-            <Image source={require('../../assets/images/plant.png')} style={styles.image} />
+            <Image source={require('../../assets/images/arrows.png')} style={styles.image4} />
+            <Image source={plantImages[currentImageIndex]} style={getImageStyle()} />
           </View>
 
           {/* Sit Time Card */}
@@ -133,7 +161,6 @@ const DailyPostureScreen = () => {
           <View style={[styles.card, styles.bloomGoalCard]}>
             <View style={styles.bloomGoalHeader}>
               <Text style={styles.bloomGoalText}>Today's Bloom Goal</Text>
-              {/* <Image source={require('../../assets/images/Info.png')} style={styles.infoIcon} /> */}
             </View>
             <View style={styles.motivationRow}>
               <View style={styles.progressBarContainer}>
@@ -357,7 +384,6 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: '#000',
     fontWeight: '600',
-    // fontFamily: 'Inter-Bold',
     textAlign: 'center', // Center align the text
   },
   minutesText: {
@@ -374,10 +400,31 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     position: 'absolute',
     top: -25,
-    left: '50%',
+    left: 125,
     transform: [{ translateX: -188 }],
+    // opacity: 0.5,
+  },
+  image1: {
+    width: '130%',
+    height: '95.2%',
+    resizeMode: 'contain',
+    position: 'absolute',
+    top: -1,
+    left: 166.4,
+    transform: [{ translateX: -188 }],
+    // opacity: 0,
   },
   image2: {
+    width: '130%',
+    height: '90%',
+    resizeMode: 'contain',
+    position: 'absolute',
+    top: 10,
+    left: 172.1,
+    transform: [{ translateX: -188 }],
+    // opacity: 0,
+  },
+  image4: {
     width: '75%',
     height: '75%',
     resizeMode: 'contain',
