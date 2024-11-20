@@ -7,12 +7,15 @@ const IntroScreen = () => {
   const [showPlant, setShowPlant] = useState(false);
   const [showPostureText, setShowPostureText] = useState(false);
   const [showGoodPostureText, setShowGoodPostureText] = useState(false);
+  const [showBadPostureText, setShowBadPostureText] = useState(false);
+  const [showFinalText, setShowFinalText] = useState(false);
   const [name, setName] = useState('');
   const progressBarWidth = useRef(new Animated.Value(0)).current;
   const arrowsAnimation = useRef(new Animated.Value(0)).current;
+  const spinAnimation = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (showGoodPostureText) {
+    if (showGoodPostureText || showBadPostureText) {
       Animated.loop(
         Animated.sequence([
           Animated.timing(arrowsAnimation, {
@@ -28,7 +31,17 @@ const IntroScreen = () => {
         ])
       ).start();
     }
-  }, [showGoodPostureText]);
+  }, [showGoodPostureText, showBadPostureText]);
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(spinAnimation, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      })
+    ).start();
+  }, []);
 
   const handleNameSubmit = () => {
     if (taps < 6) {
@@ -73,6 +86,10 @@ const IntroScreen = () => {
         setShowPostureText(true);
       } else if (taps + 1 === 4) {
         setShowGoodPostureText(true);
+      } else if (taps + 1 === 5) {
+        setShowBadPostureText(true);
+      } else if (taps + 1 === 6) {
+        setShowFinalText(true);
       }
     }
   };
@@ -82,6 +99,15 @@ const IntroScreen = () => {
     outputRange: ['0%', '100%'],
   });
 
+  const spin = spinAnimation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  const arrowImageSource = showBadPostureText
+    ? require('../assets/images/darrow.png')
+    : require('../assets/images/arrows.png');
+
   return (
     <View style={styles.container}>
       {/* Custom Progress Bar */}
@@ -90,29 +116,58 @@ const IntroScreen = () => {
       </View>
 
       <View style={styles.contentContainer}>
-        {showPlant ? (
+        {showFinalText ? (
+          <>
+            <Text style={styles.greetingText2}>Let’s start your journey by connecting your device.</Text>
+            <Text style={styles.finalText}>Press and hold the button on the back of the sleeve for 3 seconds</Text>
+            <View style={styles.load}>
+              <View style={styles.innerCircle}>
+                <Animated.Image source={require('../assets/images/load.png')} style={[styles.loadImage, { transform: [{ rotate: spin }] }]} />
+              </View>
+              <Text style={styles.searchingText}>Searching...</Text>
+            </View>
+          </>
+        ) : showPlant ? (
           <TouchableOpacity style={styles.contentContainer} onPress={handlePlantTap} activeOpacity={1}>
             <Text style={[styles.greetingText2, showGoodPostureText && styles.greetingText2Expanded]}>
-              {showGoodPostureText
+              {showBadPostureText
+                ? 'but when your posture is bad, your plant is in danger of dying.'
+                : showGoodPostureText
                 ? 'When your posture is good, your plant is tall, grounded, and healthy...'
                 : showPostureText
                 ? 'It represents your posture.'
                 : 'This is your plant.'}
             </Text>
-            {showGoodPostureText && (
+            {showBadPostureText ? (
+              <View style={styles.goodPostureContainer}>
+                <Text style={styles.goodPostureText2}>Uh oh!</Text>
+                <Image source={require('../assets/images/sad.png')} style={styles.happyImage} />
+              </View>
+            ) : showGoodPostureText ? (
               <View style={styles.goodPostureContainer}>
                 <Text style={styles.goodPostureText}>Looking Good!</Text>
                 <Image source={require('../assets/images/happy.png')} style={styles.happyImage} />
               </View>
-            )}
-            {showGoodPostureText && (
+            ) : null}
+            {showGoodPostureText || showBadPostureText ? (
               <Animated.Image
-                source={require('../assets/images/arrows.png')}
+                source={arrowImageSource}
                 style={[styles.arrowsImage, { transform: [{ translateY: arrowsAnimation }] }]}
               />
+            ) : null}
+            {!showFinalText && (
+              <>
+                <Image
+                  source={
+                    showBadPostureText
+                      ? require('../assets/images/plant3.png')
+                      : require('../assets/images/plant.png')
+                  }
+                  style={styles.plantImage}
+                />
+                <View style={styles.box} />
+              </>
             )}
-            <Image source={require('../assets/images/plant.png')} style={styles.plantImage} />
-            <View style={styles.box} />
           </TouchableOpacity>
         ) : showCircle ? (
           <>
@@ -201,6 +256,7 @@ const styles = StyleSheet.create({
   },
   greetingText2Expanded: {
     top: '-18%',
+    width: 300,
   },
   goodPostureContainer: {
     flexDirection: 'row',
@@ -211,6 +267,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     color: '#9DC284',
+  },
+  goodPostureText2: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#BB271A',
   },
   happyImage: {
     width: 35,
@@ -296,6 +357,47 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     position: 'absolute',
     top: '70%',
+  },
+  finalText: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#343434',
+    textAlign: 'center',
+    width: 300,
+    lineHeight: 35,
+    position: 'absolute',
+    top: '35%',
+  },
+  load: {
+    width: 223,
+    height: 62,
+    backgroundColor: '#CDE29B',
+    borderRadius: 50,
+    position: 'absolute',
+    top: '47%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  innerCircle: {
+    width: 38,
+    height: 38,
+    borderRadius: 100,
+    backgroundColor: 'white',
+    marginBottom: 5,
+    position: 'absolute',
+    left: 10,
+  },
+  loadImage: {
+    width: 38,
+    height: 34,
+    resizeMode: 'contain',
+    top: 2,
+  },
+  searchingText: {
+    fontSize: 18,
+    fontWeight: '400',
+    color: 'black',
+    left: 10,
   },
 });
 
