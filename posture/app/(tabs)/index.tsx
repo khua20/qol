@@ -19,14 +19,24 @@ const DailyPostureScreen = () => {
   const [isIncrementing, setIsIncrementing] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const scrollY = useRef(new Animated.Value(0)).current;
+  const arrowsAnimation = useRef(new Animated.Value(0)).current;
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setCurrentImageIndex((prevIndex) => (prevIndex + 1) % plantImages.length);
-  //   }, 2000); // Change image every 2 seconds
-
-  //   return () => clearInterval(interval);
-  // }, []);
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(arrowsAnimation, {
+          toValue: -10,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(arrowsAnimation, {
+          toValue: 0,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
 
   const sunImageTranslate = scrollY.interpolate({
     inputRange: [0, 200],
@@ -128,7 +138,10 @@ const DailyPostureScreen = () => {
         <View style={styles.contentContainer}>
           {/* Plant Card */}
           <View style={styles.card}>
-            <Image source={require('../../assets/images/arrows.png')} style={styles.image4} />
+            <Animated.Image
+              source={require('../../assets/images/arrows.png')}
+              style={[styles.image4, { transform: [{ translateY: arrowsAnimation }] }]}
+            />
             <Image source={plantImages[currentImageIndex]} style={getImageStyle()} />
           </View>
 
@@ -430,7 +443,7 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     position: 'absolute',
     top: 10,
-    left: '34%',
+    left: '15%',
     transform: [{ translateX: -50 }],
   },
   sitTimeText: {
