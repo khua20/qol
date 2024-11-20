@@ -131,9 +131,9 @@ const IntroScreen = () => {
           <TouchableOpacity style={styles.contentContainer} onPress={handlePlantTap} activeOpacity={1}>
             <Text style={[styles.greetingText2, showGoodPostureText && styles.greetingText2Expanded]}>
               {showBadPostureText
-                ? 'but when your posture is bad, your plant is in danger of dying.'
+                ? 'but when your posture is\n bad, your plant is in danger\n of dying.'
                 : showGoodPostureText
-                ? 'When your posture is good, your plant is tall, grounded, and healthy...'
+                ? 'When your posture is good, your plant is tall,\n grounded, and healthy...'
                 : showPostureText
                 ? 'It represents your posture.'
                 : 'This is your plant.'}
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   },
   greetingText2Expanded: {
     top: '-18%',
-    width: 300,
+    width: 350,
   },
   goodPostureContainer: {
     flexDirection: 'row',
