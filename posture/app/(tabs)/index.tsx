@@ -18,6 +18,7 @@ const DailyPostureScreen = () => {
   const [currentGoal, setCurrentGoal] = useState(0);
   const [isIncrementing, setIsIncrementing] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [goalCompleted, setGoalCompleted] = useState(false);
   const scrollY = useRef(new Animated.Value(0)).current;
   const arrowsAnimation = useRef(new Animated.Value(0)).current;
 
@@ -73,6 +74,7 @@ const DailyPostureScreen = () => {
             return prevGoal + 1;
           } else {
             setIsIncrementing(false);
+            setGoalCompleted(true);
             clearInterval(interval);
             return prevGoal;
           }
@@ -216,11 +218,7 @@ const DailyPostureScreen = () => {
               <View style={styles.motivationContainer}>
                 <Image source={require('../../assets/images/bulb.png')} style={styles.lightbulbImage} />
                 <Text style={styles.motivationText}>
-                  you're{'\n'}
-                  almost{'\n'}
-                  there! keep{'\n'}
-                  up the good{'\n'}
-                  work
+                  {goalCompleted ? 'Goal completed!\nGood work :)\n\n' : "you're\nalmost\nthere! keep\nup the good\nwork"}
                 </Text>
               </View>
             </View>
