@@ -11,6 +11,7 @@ const IntroScreen = () => {
   const [showBadPostureText, setShowBadPostureText] = useState(false);
   const [showFinalText, setShowFinalText] = useState(false);
   const [showCalibrationText, setShowCalibrationText] = useState(false);
+  const [calibrationText, setCalibrationText] = useState('In order to track your \n posture and keep your\n plant alive, let’s calibrate\n your device!');
   const [name, setName] = useState('');
   const progressBarWidth = useRef(new Animated.Value(0)).current;
   const arrowsAnimation = useRef(new Animated.Value(0)).current;
@@ -98,6 +99,14 @@ const IntroScreen = () => {
     }
   };
 
+  const handleCalibrationTap = () => {
+    if (calibrationText === 'In order to track your \n posture and keep your\n plant alive, let’s calibrate\n your device!') {
+      setCalibrationText('Sit up straight in a posture\n that feels natural and\n comfortable for you.');
+    } else if (calibrationText === 'Sit up straight in a posture\n that feels natural and\n comfortable for you.') {
+      setCalibrationText('Stay still for 30 seconds');
+    }
+  };
+
   const progressBarWidthInterpolated = progressBarWidth.interpolate({
     inputRange: [0, 100],
     outputRange: ['0%', '100%'],
@@ -128,24 +137,26 @@ const IntroScreen = () => {
 
       <View style={styles.contentContainer}>
         {showCalibrationText ? (
-          <>
-            <Text style={styles.greetingText3}>In order to track your {`\n`} posture and keep your{`\n`} plant alive, let’s calibrate{`\n`} your device!</Text>
+          <TouchableOpacity style={styles.contentContainer} onPress={handleCalibrationTap} activeOpacity={1}>
+            <Text style={styles.greetingText3}>{calibrationText}</Text>
             <Image source={require('../assets/images/sit.png')} style={styles.sit} />
-            <Svg width={250} height={250} viewBox="19 -25 250 250">
-              <G transform={`rotate(${-95}, 125, 125)`}>
-                <Circle
-                  cx="50%"
-                  cy="50%"
-                  r={radius}
-                  stroke={backgroundColor}
-                  strokeWidth={backgroundStrokeWidth}
-                  strokeDasharray={`${backgroundDashSize} ${backgroundGapSize}`}
-                  strokeLinecap="round"
-                  fill="none"
-                />
-              </G>
-            </Svg>
-          </>
+            <View style={styles.circleContainer}>
+              <Svg width={250} height={250} viewBox="19 -25 250 250">
+                <G transform={`rotate(${-95}, 125, 125)`}>
+                  <Circle
+                    cx="50%"
+                    cy="50%"
+                    r={radius}
+                    stroke={backgroundColor}
+                    strokeWidth={backgroundStrokeWidth}
+                    strokeDasharray={`${backgroundDashSize} ${backgroundGapSize}`}
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                </G>
+              </Svg>
+            </View>
+          </TouchableOpacity>
         ) : showFinalText ? (
           <TouchableOpacity style={styles.contentContainer} onPress={handlePlantTap} activeOpacity={1}>
             <Text style={styles.greetingText2}>Let’s start your journey by connecting your device.</Text>
@@ -291,7 +302,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: '700',
     color: '#343434', // Darker text color for the greeting
-    top: '-10%',
+    top: '-20%',
     textAlign: 'center',
     width: 350,
   },
@@ -358,6 +369,12 @@ const styles = StyleSheet.create({
     height: 235,
     borderRadius: 1000,
     backgroundColor: '#CDE29B',
+  },
+  circleContainer: {
+    position: 'absolute',
+    top: '60%',
+    left: '50%',
+    transform: [{ translateX: -125 }, { translateY: -125 }],
   },
   dashedCircle: {
     width: 235,
@@ -454,7 +471,7 @@ const styles = StyleSheet.create({
     width: 125,
     height: 125,
     position: 'absolute',
-    top: '50%',
+    top: '53%',
     left: '36%',
     zIndex: 1,
     resizeMode: 'contain',
