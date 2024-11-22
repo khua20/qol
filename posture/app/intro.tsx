@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, Animated, Image } from 'react-native';
+import Svg, { G, Circle } from 'react-native-svg';
 
 const IntroScreen = () => {
   const [taps, setTaps] = useState(0);
@@ -111,6 +112,12 @@ const IntroScreen = () => {
     ? require('../assets/images/darrow.png')
     : require('../assets/images/arrows.png');
 
+  const radius = 120; // Half of the dimensions (235) minus half of the stroke width (9)
+  const backgroundStrokeWidth = 9;
+  const backgroundColor = '#908B8B';
+  const backgroundDashSize = 20;
+  const backgroundGapSize = 65;
+
   return (
     <View style={[styles.container, showCalibrationText && styles.calibrationContainer]}>
       {!showCalibrationText && (
@@ -123,7 +130,21 @@ const IntroScreen = () => {
         {showCalibrationText ? (
           <>
             <Text style={styles.greetingText3}>In order to track your {`\n`} posture and keep your{`\n`} plant alive, let’s calibrate{`\n`} your device!</Text>
-            <View style={styles.dashedCircle} />
+            <Image source={require('../assets/images/sit.png')} style={styles.sit} />
+            <Svg width={250} height={250} viewBox="19 -25 250 250">
+              <G transform={`rotate(${-95}, 125, 125)`}>
+                <Circle
+                  cx="50%"
+                  cy="50%"
+                  r={radius}
+                  stroke={backgroundColor}
+                  strokeWidth={backgroundStrokeWidth}
+                  strokeDasharray={`${backgroundDashSize} ${backgroundGapSize}`}
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </G>
+            </Svg>
           </>
         ) : showFinalText ? (
           <TouchableOpacity style={styles.contentContainer} onPress={handlePlantTap} activeOpacity={1}>
@@ -429,6 +450,15 @@ const styles = StyleSheet.create({
     color: 'black',
     left: 10,
   },
+  sit: {
+    width: 150,
+    height: 150,
+    position: 'absolute',
+    top: '48%',
+    left: '33%',
+    zIndex: 1,
+    resizeMode: 'contain',
+  }
 });
 
 export default IntroScreen;
