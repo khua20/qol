@@ -451,11 +451,11 @@ const styles = StyleSheet.create({
     left: 10,
   },
   sit: {
-    width: 150,
-    height: 150,
+    width: 125,
+    height: 125,
     position: 'absolute',
-    top: '48%',
-    left: '33%',
+    top: '50%',
+    left: '36%',
     zIndex: 1,
     resizeMode: 'contain',
   }
