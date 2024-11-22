@@ -5,7 +5,7 @@ import AnimatedCircleProgress from '../../components/AnimatedCircleProgress'; //
 const { width: screenWidth } = Dimensions.get('window');
 
 const plantImages = [
-  require('../../assets/images/plant.png'),
+  require('../../assets/images/plant1.png'),
   require('../../assets/images/plant2.png'),
   require('../../assets/images/plant3.png'),
 ];
@@ -19,8 +19,39 @@ const DailyPostureScreen = () => {
   const [isIncrementing, setIsIncrementing] = useState(true);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [goalCompleted, setGoalCompleted] = useState(false);
+  const [isForward, setIsForward] = useState(true); // Track the direction of image cycling
   const scrollY = useRef(new Animated.Value(0)).current;
   const arrowsAnimation = useRef(new Animated.Value(0)).current;
+  const [arrowImageSource, setArrowImageSource] = useState(require('../../assets/images/arrows.png'));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => {
+        let newIndex;
+        if (isForward) {
+          if (prevIndex === plantImages.length - 1) {
+            setIsForward(false);
+            newIndex = prevIndex - 1;
+          } else {
+            newIndex = prevIndex + 1;
+          }
+        } else {
+          if (prevIndex === 0) {
+            setIsForward(true);
+            newIndex = prevIndex + 1;
+          } else {
+            newIndex = prevIndex - 1;
+          }
+        }
+        setTimeout(() => {
+          setArrowImageSource(newIndex === 2 ? require('../../assets/images/darrow.png') : require('../../assets/images/arrows.png'));
+        }, 400); // Delay the arrow image change by 1 second
+        return newIndex;
+      });
+    }, 3000); // Change image every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [isForward]);
 
   useEffect(() => {
     Animated.loop(
@@ -92,19 +123,6 @@ const DailyPostureScreen = () => {
     }, 10); // Adjust the interval time as needed
   };
 
-  const getImageStyle = () => {
-    switch (currentImageIndex) {
-      case 0:
-        return styles.image;
-      case 1:
-        return styles.image1;
-      case 2:
-        return styles.image2;
-      default:
-        return styles.image;
-    }
-  };
-
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -141,10 +159,10 @@ const DailyPostureScreen = () => {
           {/* Plant Card */}
           <View style={styles.card}>
             <Animated.Image
-              source={require('../../assets/images/arrows.png')}
+              source={arrowImageSource}
               style={[styles.image4, { transform: [{ translateY: arrowsAnimation }] }]}
             />
-            <Image source={plantImages[currentImageIndex]} style={getImageStyle()} />
+            <Image source={plantImages[currentImageIndex]} style={styles.image} />
           </View>
 
           {/* Sit Time Card */}
@@ -406,34 +424,14 @@ const styles = StyleSheet.create({
     marginTop: 3, // Adjust this value to move the text up
   },
   image: {
-    width: '140%',
-    height: '105%',
+    width: '150%',
+    height: '150%',
     resizeMode: 'contain',
     position: 'absolute',
-    top: -25,
-    left: 125,
+    top: -90,
+    left: 150,
     transform: [{ translateX: -188 }],
     // opacity: 0.5,
-  },
-  image1: {
-    width: '130%',
-    height: '95.2%',
-    resizeMode: 'contain',
-    position: 'absolute',
-    top: -1,
-    left: 166.4,
-    transform: [{ translateX: -188 }],
-    // opacity: 0,
-  },
-  image2: {
-    width: '130%',
-    height: '90%',
-    resizeMode: 'contain',
-    position: 'absolute',
-    top: 10,
-    left: 172.1,
-    transform: [{ translateX: -188 }],
-    // opacity: 0,
   },
   image4: {
     width: '75%',

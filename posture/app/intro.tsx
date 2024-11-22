@@ -9,6 +9,7 @@ const IntroScreen = () => {
   const [showGoodPostureText, setShowGoodPostureText] = useState(false);
   const [showBadPostureText, setShowBadPostureText] = useState(false);
   const [showFinalText, setShowFinalText] = useState(false);
+  const [showCalibrationText, setShowCalibrationText] = useState(false);
   const [name, setName] = useState('');
   const progressBarWidth = useRef(new Animated.Value(0)).current;
   const arrowsAnimation = useRef(new Animated.Value(0)).current;
@@ -91,6 +92,8 @@ const IntroScreen = () => {
       } else if (taps + 1 === 6) {
         setShowFinalText(true);
       }
+    } else if (showFinalText) {
+      setShowCalibrationText(true);
     }
   };
 
@@ -109,15 +112,21 @@ const IntroScreen = () => {
     : require('../assets/images/arrows.png');
 
   return (
-    <View style={styles.container}>
-      {/* Custom Progress Bar */}
-      <View style={styles.progressBarContainer}>
-        <Animated.View style={[styles.progressBar, { width: progressBarWidthInterpolated }]} />
-      </View>
+    <View style={[styles.container, showCalibrationText && styles.calibrationContainer]}>
+      {!showCalibrationText && (
+        <View style={styles.progressBarContainer}>
+          <Animated.View style={[styles.progressBar, { width: progressBarWidthInterpolated }]} />
+        </View>
+      )}
 
       <View style={styles.contentContainer}>
-        {showFinalText ? (
+        {showCalibrationText ? (
           <>
+            <Text style={styles.greetingText3}>In order to track your {`\n`} posture and keep your{`\n`} plant alive, let’s calibrate{`\n`} your device!</Text>
+            <View style={styles.dashedCircle} />
+          </>
+        ) : showFinalText ? (
+          <TouchableOpacity style={styles.contentContainer} onPress={handlePlantTap} activeOpacity={1}>
             <Text style={styles.greetingText2}>Let’s start your journey by connecting your device.</Text>
             <Text style={styles.finalText}>Press and hold the button on the back of the sleeve for 3 seconds</Text>
             <View style={styles.load}>
@@ -126,7 +135,7 @@ const IntroScreen = () => {
               </View>
               <Text style={styles.searchingText}>Searching...</Text>
             </View>
-          </>
+          </TouchableOpacity>
         ) : showPlant ? (
           <TouchableOpacity style={styles.contentContainer} onPress={handlePlantTap} activeOpacity={1}>
             <Text style={[styles.greetingText2, showGoodPostureText && styles.greetingText2Expanded]}>
@@ -161,7 +170,7 @@ const IntroScreen = () => {
                   source={
                     showBadPostureText
                       ? require('../assets/images/plant3.png')
-                      : require('../assets/images/plant.png')
+                      : require('../assets/images/plant1.png')
                   }
                   style={styles.plantImage}
                 />
@@ -211,6 +220,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
+  calibrationContainer: {
+    backgroundColor: '#D9D9D9', // Background color for calibration screen
+  },
   progressBarContainer: {
     width: '50%',
     height: 5,
@@ -254,6 +266,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: 350,
   },
+  greetingText3: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#343434', // Darker text color for the greeting
+    top: '-10%',
+    textAlign: 'center',
+    width: 350,
+  },
   greetingText2Expanded: {
     top: '-18%',
     width: 350,
@@ -282,7 +302,7 @@ const styles = StyleSheet.create({
     width: 200,
     height: 200,
     position: 'absolute',
-    top: '49%',
+    top: '51%',
     left: '23%',
     zIndex: 0,
     resizeMode: 'contain',
@@ -313,10 +333,18 @@ const styles = StyleSheet.create({
     left: -5,
   },
   circle: {
-    width: 230,
-    height: 230,
+    width: 235,
+    height: 235,
     borderRadius: 1000,
     backgroundColor: '#CDE29B',
+  },
+  dashedCircle: {
+    width: 235,
+    height: 235,
+    borderRadius: 1000,
+    borderWidth: 9,
+    borderColor: '#908B8B',
+    borderStyle: 'dashed',
   },
   postureText: {
     fontSize: 24,
@@ -341,12 +369,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   plantImage: {
-    width: 275,
-    height: 275,
+    width: 350,
+    height: 350,
     resizeMode: 'contain',
     zIndex: 1,
     position: 'absolute',
-    top: '45.5%',
+    top: '42%',
     left: '43%',
     transform: [{ translateX: -137.5 }],
   },
@@ -384,6 +412,8 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     backgroundColor: 'white',
     marginBottom: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
     position: 'absolute',
     left: 10,
   },
