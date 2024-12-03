@@ -45,7 +45,7 @@ const DailyPostureScreen = () => {
         }
         setTimeout(() => {
           setArrowImageSource(newIndex === 2 ? require('../../assets/images/darrow.png') : require('../../assets/images/arrows.png'));
-        }, 400); // Delay the arrow image change by 1 second
+        }, 775); // Delay the arrow image change by 1 second
         return newIndex;
       });
     }, 3000); // Change image every 3 seconds

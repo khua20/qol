@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, Animated, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, TouchableOpacity, Image, Animated } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 
 const { width: screenWidth } = Dimensions.get('window');

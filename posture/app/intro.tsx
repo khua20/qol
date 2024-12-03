@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, Animated, Image } from 'react-native';
-import Svg, { G, Circle } from 'react-native-svg';
+import { DashedProgress } from 'react-native-dashed-progress';
+import { router } from 'expo-router';
 
 const IntroScreen = () => {
   const [taps, setTaps] = useState(0);
@@ -13,9 +14,11 @@ const IntroScreen = () => {
   const [showCalibrationText, setShowCalibrationText] = useState(false);
   const [calibrationText, setCalibrationText] = useState('In order to track your \n posture and keep your\n plant alive, let’s calibrate\n your device!');
   const [name, setName] = useState('');
+  const [progress, setProgress] = useState(0); // Add progress state
+  const [isCalibrationDone, setIsCalibrationDone] = useState(false); // Add state for calibration completion
   const progressBarWidth = useRef(new Animated.Value(0)).current;
-  const arrowsAnimation = useRef(new Animated.Value(0)).current;
-  const spinAnimation = useRef(new Animated.Value(0)).current;
+  const arrowsAnimation = new Animated.Value(0);
+  const spinAnimation = new Animated.Value(0);
 
   useEffect(() => {
     if (showGoodPostureText || showBadPostureText) {
@@ -37,14 +40,16 @@ const IntroScreen = () => {
   }, [showGoodPostureText, showBadPostureText]);
 
   useEffect(() => {
-    Animated.loop(
-      Animated.timing(spinAnimation, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      })
-    ).start();
-  }, []);
+    if (showFinalText) {
+      Animated.loop(
+        Animated.timing(spinAnimation, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        })
+      ).start();
+    }
+  }, [showFinalText]);
 
   const handleNameSubmit = () => {
     if (taps < 6) {
@@ -104,6 +109,22 @@ const IntroScreen = () => {
       setCalibrationText('Sit up straight in a posture\n that feels natural and\n comfortable for you.');
     } else if (calibrationText === 'Sit up straight in a posture\n that feels natural and\n comfortable for you.') {
       setCalibrationText('Stay still for 30 seconds');
+    } else if (calibrationText === 'Stay still for 30 seconds') {
+      setProgress((prevProgress) => {
+        const newProgress = Math.min(prevProgress + 1, 9);
+        if (newProgress === 9) {
+          setIsCalibrationDone(true); // Set calibration done state
+        }
+        return newProgress;
+      });
+    } else if (isCalibrationDone) {
+      router.push('/'); // Navigate to index screen
+    }
+  };
+
+  const handleDoneTap = () => {
+    if (isCalibrationDone) {
+      router.push('/'); // Navigate to index screen
     }
   };
 
@@ -121,14 +142,8 @@ const IntroScreen = () => {
     ? require('../assets/images/darrow.png')
     : require('../assets/images/arrows.png');
 
-  const radius = 120; // Half of the dimensions (235) minus half of the stroke width (9)
-  const backgroundStrokeWidth = 9;
-  const backgroundColor = '#908B8B';
-  const backgroundDashSize = 20;
-  const backgroundGapSize = 65;
-
   return (
-    <View style={[styles.container, showCalibrationText && styles.calibrationContainer]}>
+    <View style={[styles.container, showCalibrationText && styles.calibrationContainer, isCalibrationDone && styles.doneContainer]}>
       {!showCalibrationText && (
         <View style={styles.progressBarContainer}>
           <Animated.View style={[styles.progressBar, { width: progressBarWidthInterpolated }]} />
@@ -137,25 +152,36 @@ const IntroScreen = () => {
 
       <View style={styles.contentContainer}>
         {showCalibrationText ? (
-          <TouchableOpacity style={styles.contentContainer} onPress={handleCalibrationTap} activeOpacity={1}>
-            <Text style={styles.greetingText3}>{calibrationText}</Text>
+          <TouchableOpacity style={styles.contentContainer} onPress={isCalibrationDone ? handleDoneTap : handleCalibrationTap} activeOpacity={1}>
+            {isCalibrationDone ? (
+              <View style={styles.load2}>
+                <View style={styles.innerCircle}>
+                  <Animated.Image source={require('../assets/images/checkout.png')} style={[styles.loadImage]} />
+                </View>
+                <Text style={styles.doneText}>Done!</Text>
+              </View>
+            ) : (
+              <Text style={styles.greetingText3}>{calibrationText}</Text>
+            )}
             <Image source={require('../assets/images/sit.png')} style={styles.sit} />
             <View style={styles.circleContainer}>
-              <Svg width={250} height={250} viewBox="19 -25 250 250">
-                <G transform={`rotate(${-95}, 125, 125)`}>
-                  <Circle
-                    cx="50%"
-                    cy="50%"
-                    r={radius}
-                    stroke={backgroundColor}
-                    strokeWidth={backgroundStrokeWidth}
-                    strokeDasharray={`${backgroundDashSize} ${backgroundGapSize}`}
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                </G>
-              </Svg>
+              <DashedProgress
+                fill={progress}
+                countBars={9}
+                radius={100}
+                strokeColor="#B4FF00"
+                trailColor="#908B8B"
+                strokeThickness={10}
+                barWidth={10}
+                strokeLinecap="round"
+                showTooltip={false}
+                duration={1} // Shorter duration for faster animation
+                indicatorColor="#B4FF00"
+              />
             </View>
+            {isCalibrationDone && (
+              <Text style={styles.tapToContinueText}>Tap to continue to the app</Text>
+            )}
           </TouchableOpacity>
         ) : showFinalText ? (
           <TouchableOpacity style={styles.contentContainer} onPress={handlePlantTap} activeOpacity={1}>
@@ -444,6 +470,22 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  load2: {
+    width: 223,
+    height: 62,
+    backgroundColor: '#CDE29B',
+    borderRadius: 50,
+    position: 'absolute',
+    top: '25%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  doneText: {
+    fontSize: 20,
+    fontWeight: '400',
+    color: '#343434',
+    textAlign: 'center',
+  },
   innerCircle: {
     width: 38,
     height: 38,
@@ -459,7 +501,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 34,
     resizeMode: 'contain',
-    top: 2,
+    top: 0,
   },
   searchingText: {
     fontSize: 18,
@@ -475,7 +517,17 @@ const styles = StyleSheet.create({
     left: '36%',
     zIndex: 1,
     resizeMode: 'contain',
-  }
+  },
+  doneContainer: {
+    backgroundColor: '#F9F9EE', // Change background color when calibration is done
+  },
+  tapToContinueText: {
+    position: 'absolute',
+    bottom: 20,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#343434',
+  },
 });
 
 export default IntroScreen;
