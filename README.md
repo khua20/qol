@@ -1,4 +1,4 @@
-# Posture App
+# StemUp
 
 ## Description
 
