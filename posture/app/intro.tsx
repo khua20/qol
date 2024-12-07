@@ -261,7 +261,8 @@ const IntroScreen = () => {
             <Text style={styles.greetingText}>Hello {name}!</Text>
             <Text style={styles.postureText}>Welcome to</Text>
             <View style={styles.circle}>
-              <Image source={require('../assets/images/logo.png')} style={styles.logoImage} />
+              <Image source={require('../assets/images/logo.png')} style={styles.logoText} />
+              <Text style={styles.logoImage}>StemUp</Text>
             </View>
             <Text style={styles.postureText}>your posture companion.</Text>
             <TouchableOpacity style={styles.getStartedButton} onPress={handleGetStarted}>
@@ -464,13 +465,20 @@ const styles = StyleSheet.create({
     left: '43%',
     transform: [{ translateX: -137.5 }],
   },
+  logoText: {
+    top: -10,
+    left: 30,
+    width: 200,
+    height: 200,
+  },
   logoImage: {
-    width: 300,
-    height: 300,
-    left: -13,
-    top: -50,
+    fontSize: 30,
+    left: 60,
+    top: 150,
     resizeMode: 'contain',
     position: 'absolute',
+    fontWeight: '700',
+    color: '#5F7B3A',
   },
   box: {
     width: '108%',

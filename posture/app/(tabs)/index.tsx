@@ -149,7 +149,7 @@ const DailyPostureScreen = () => {
         scrollEventThrottle={16}
       >
         {/* Header */}
-        <Text style={styles.greeting}>Hello, Mariam</Text>
+        <Text style={styles.greeting}>Hello, Tamim</Text>
         
         {/* Title */}
         <View style={styles.titleContainer}>

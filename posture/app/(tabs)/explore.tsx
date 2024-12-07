@@ -167,7 +167,7 @@ const SettingsScreen = () => {
           style={styles.profileImage}
         />
         <View style={styles.profileInfo}>
-          <Text style={styles.profileName}>Mariam Jalloh</Text>
+          <Text style={styles.profileName}>Tamim Hasan</Text>
         </View>
       </View>
 
@@ -184,7 +184,7 @@ const SettingsScreen = () => {
               source={require("../../assets/images/device.png")}
               style={styles.deviceIcon}
             />
-            <Text style={styles.settingsText}>Mariam's Device</Text>
+            <Text style={styles.settingsText}>Tamim Hasan's Device</Text>
             <Image
               source={
                 expandedItem === "device"
