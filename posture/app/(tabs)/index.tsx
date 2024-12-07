@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, Dimensions, ScrollView, Animated, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import AnimatedCircleProgress from '../../components/AnimatedCircleProgress'; // Adjust the path as necessary
+import AnimatedPieChart from '../../components/PieChartComponent';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -20,6 +21,7 @@ const DailyPostureScreen = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [goalCompleted, setGoalCompleted] = useState(false);
   const [isForward, setIsForward] = useState(true); // Track the direction of image cycling
+  const [showPieChart, setShowPieChart] = useState(false); // State variable for pie chart visibility
   const scrollY = useRef(new Animated.Value(0)).current;
   const arrowsAnimation = useRef(new Animated.Value(0)).current;
   const [arrowImageSource, setArrowImageSource] = useState(require('../../assets/images/arrows.png'));
@@ -95,6 +97,7 @@ const DailyPostureScreen = () => {
   const handleGoalSubmit = () => {
     setGoalSet(true);
     setGoalInputVisible(false);
+    setShowPieChart(true); // Show the pie chart when the button is pressed
 
     const goalValue = parseInt(goal, 10);
     const interval = setInterval(() => {
@@ -169,13 +172,18 @@ const DailyPostureScreen = () => {
           <View style={[styles.card, styles.sitTimeCard]}>
             <Text style={styles.sitTimeText}>Sit Time</Text>
             <Text style={styles.timeText}>
-              <Text style={styles.timeNumber}>0</Text>
+              <Text style={styles.timeNumber}>{currentGoal}</Text>
               <Text style={styles.timeUnit}> Min</Text>
             </Text>
             {/* Placeholder for pie chart */}
             <View style={styles.pieChart}>
-              <View style={styles.filledcircle}></View>
-              {/* <Image source={require('../../assets/images/PieChart.png')} style={{ width: '100%', height: '100%' }} /> */}
+              {showPieChart ? (
+                <AnimatedPieChart />
+              ) : (
+                <View style={styles.filledcircle}>
+                  <Text style={styles.noText}>{'no\nprogress\nyet...'}</Text>
+                </View>
+              )}
             </View>
             {/* Legend */}
             <View style={styles.legendContainer}>
@@ -255,6 +263,14 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingBottom: 20,
+  },
+  noText: {
+    fontSize: 12,
+    color: '#000',
+    fontWeight: '400',
+    fontFamily: 'Inter-Regular',
+    textAlign: 'center',
+    marginTop: 20,
   },
   sunImage: {
     position: 'absolute',
@@ -470,7 +486,7 @@ const styles = StyleSheet.create({
     width: 95,
     height: 95,
     borderRadius: 60,
-    marginTop: 5,
+    marginTop: 0,
   },
   legendContainer: {
     flexDirection: 'row',

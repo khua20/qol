@@ -51,6 +51,26 @@ const IntroScreen = () => {
     }
   }, [showFinalText]);
 
+  useEffect(() => {
+    // Prefetch images
+    const images = [
+      require('../assets/images/plant1.png'),
+      require('../assets/images/plant3.png'),
+      require('../assets/images/happy.png'),
+      require('../assets/images/sad.png'),
+      require('../assets/images/arrows.png'),
+      require('../assets/images/darrow.png'),
+      require('../assets/images/load.png'),
+      require('../assets/images/checkout.png'),
+      require('../assets/images/sit.png'),
+    ];
+
+    images.forEach((image) => {
+      const { uri } = Image.resolveAssetSource(image);
+      Image.prefetch(uri);
+    });
+  }, []);
+
   const handleNameSubmit = () => {
     if (taps < 6) {
       setTaps(taps + 1);
