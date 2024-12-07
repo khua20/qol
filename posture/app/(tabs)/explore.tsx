@@ -1,7 +1,19 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Animated, Dimensions, ScrollView, Modal } from 'react-native';
-import Slider from '@react-native-community/slider';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState, useRef } from "react";
+import * as Notifications from "expo-notifications";
+import {
+  View,
+  Platform,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Animated,
+  Dimensions,
+  ScrollView,
+  Modal,
+} from "react-native";
+import Slider from "@react-native-community/slider";
+import { useNavigation } from "@react-navigation/native";
 
 interface ToggleSwitchProps {
   isOn: boolean;
@@ -11,10 +23,18 @@ interface ToggleSwitchProps {
 const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ isOn, onToggle }) => {
   return (
     <TouchableOpacity
-      style={[styles.toggleSwitch, isOn ? styles.toggleSwitchOn : styles.toggleSwitchOff]}
+      style={[
+        styles.toggleSwitch,
+        isOn ? styles.toggleSwitchOn : styles.toggleSwitchOff,
+      ]}
       onPress={onToggle}
     >
-      <Animated.View style={[styles.toggleCircle, isOn ? styles.toggleCircleOn : styles.toggleCircleOff]} />
+      <Animated.View
+        style={[
+          styles.toggleCircle,
+          isOn ? styles.toggleCircleOn : styles.toggleCircleOff,
+        ]}
+      />
     </TouchableOpacity>
   );
 };
@@ -27,12 +47,68 @@ const SettingsScreen = () => {
   const [showOption2, setShowOption2] = useState(false);
   const [sliderValue, setSliderValue] = useState(0);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedTime, setSelectedTime] = useState('1 min');
+  const [selectedTime, setSelectedTime] = useState("1 min");
   const animation = useRef(new Animated.Value(0)).current;
   const navigation = useNavigation<any>();
+  const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
+
+  const registerForPushNotificationsAsync = async () => {
+    try {
+      if (Platform.OS === "android") {
+        await Notifications.setNotificationChannelAsync("default", {
+          name: "default",
+          importance: Notifications.AndroidImportance.MAX,
+          vibrationPattern: [0, 250, 250, 250],
+          lightColor: "#FF231F7C",
+        });
+      }
+
+      const { status: existingStatus } =
+        await Notifications.getPermissionsAsync();
+      let finalStatus = existingStatus;
+      if (existingStatus !== "granted") {
+        const { status } = await Notifications.requestPermissionsAsync();
+        finalStatus = status;
+      }
+
+      if (finalStatus !== "granted") {
+        alert("Failed to get push token for push notification!");
+        return null;
+      }
+
+      const token = (await Notifications.getExpoPushTokenAsync()).data;
+      setExpoPushToken(token);
+      console.log("Push Token:", token);
+      return token;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+
+  const sendNotification = async () => {
+    try {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "StemUp",
+          body: "Slouch Detected!",
+          sound: true,
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+          seconds: 2,
+        },
+      });
+    } catch (error) {
+      alert("Failed to send notification");
+    }
+  };
 
   const toggleExpand = (item: string): void => {
-    if (item === 'logout') {
+    if (item === "logout") {
       handleLogout();
       return;
     }
@@ -54,7 +130,7 @@ const SettingsScreen = () => {
 
   const handleLogout = () => {
     // Perform any logout logic here if needed
-    navigation.navigate('intro');
+    navigation.navigate("intro");
   };
 
   const handleVibrateToggle = () => {
@@ -71,20 +147,23 @@ const SettingsScreen = () => {
     setModalVisible(false);
   };
 
-  const screenHeight = Dimensions.get('window').height;
+  const screenHeight = Dimensions.get("window").height;
   const containerHeight = animation.interpolate({
     inputRange: [0, 1],
     outputRange: [screenHeight * 0.26, screenHeight * 0.5], // Adjust the heights as needed
   });
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.scrollContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.scrollContainer}
+    >
       <Text style={styles.title}>Settings</Text>
 
       {/* Profile Section */}
       <View style={styles.profileSection}>
         <Image
-          source={require('../../assets/images/person.png')}
+          source={require("../../assets/images/person.png")}
           style={styles.profileImage}
         />
         <View style={styles.profileInfo}>
@@ -93,29 +172,38 @@ const SettingsScreen = () => {
       </View>
 
       {/* Settings Options */}
-      <Animated.View style={[styles.settingsOptions, { height: containerHeight }]}>
-        <TouchableOpacity style={styles.settingsItem} onPress={() => toggleExpand('device')}>
+      <Animated.View
+        style={[styles.settingsOptions, { height: containerHeight }]}
+      >
+        <TouchableOpacity
+          style={styles.settingsItem}
+          onPress={() => toggleExpand("device")}
+        >
           <View style={styles.settingsItemContent}>
             <Image
-              source={require('../../assets/images/device.png')}
+              source={require("../../assets/images/device.png")}
               style={styles.deviceIcon}
             />
             <Text style={styles.settingsText}>Mariam's Device</Text>
             <Image
-              source={expandedItem === 'device' ? require('../../assets/images/downA.png') : require('../../assets/images/rightA.png')}
+              source={
+                expandedItem === "device"
+                  ? require("../../assets/images/downA.png")
+                  : require("../../assets/images/rightA.png")
+              }
               style={styles.arrowIcon}
             />
           </View>
-          {expandedItem !== 'device' && <View style={styles.leftBorder} />}
+          {expandedItem !== "device" && <View style={styles.leftBorder} />}
         </TouchableOpacity>
-        {expandedItem === 'device' && (
+        {expandedItem === "device" && (
           <View style={styles.dropdownContent}>
             <View style={styles.dropdownItem}>
               <Text style={styles.dropdownText}>Connection</Text>
               <View style={styles.statusContainer}>
                 <Text style={styles.dropdownText}>On</Text>
                 <Image
-                  source={require('../../assets/images/check.png')}
+                  source={require("../../assets/images/check.png")}
                   style={styles.checkIcon}
                 />
               </View>
@@ -125,28 +213,35 @@ const SettingsScreen = () => {
               <Text style={styles.dropdownText}>Re-Calibrate</Text>
               <View style={styles.statusContainer}>
                 <Image
-                  source={require('../../assets/images/disclosure.png')}
+                  source={require("../../assets/images/disclosure.png")}
                   style={styles.disclosureIcon}
                 />
               </View>
             </TouchableOpacity>
           </View>
         )}
-        <TouchableOpacity style={styles.settingsItem} onPress={() => toggleExpand('alerts')}>
+        <TouchableOpacity
+          style={styles.settingsItem}
+          onPress={() => toggleExpand("alerts")}
+        >
           <View style={styles.settingsItemContent}>
             <Image
-              source={require('../../assets/images/bell.png')}
+              source={require("../../assets/images/bell.png")}
               style={styles.bellIcon}
             />
             <Text style={styles.settingsText}>Alerts / Notifications</Text>
             <Image
-              source={expandedItem === 'alerts' ? require('../../assets/images/downA.png') : require('../../assets/images/rightA.png')}
+              source={
+                expandedItem === "alerts"
+                  ? require("../../assets/images/downA.png")
+                  : require("../../assets/images/rightA.png")
+              }
               style={styles.arrowIcon}
             />
           </View>
-          {expandedItem !== 'alerts' && <View style={styles.leftBorder} />}
+          {expandedItem !== "alerts" && <View style={styles.leftBorder} />}
         </TouchableOpacity>
-        {expandedItem === 'alerts' && (
+        {expandedItem === "alerts" && (
           <View style={styles.dropdownContent}>
             <View style={styles.dropdownItem}>
               <Text style={styles.dropdownText}>Vibrate when bad posture</Text>
@@ -171,61 +266,88 @@ const SettingsScreen = () => {
               </View>
             )}
             <View style={styles.dropdownItem}>
-              <Text style={styles.dropdownText}>Pop-up alert for bad posture</Text>
-              <ToggleSwitch isOn={popupAlertOn} onToggle={() => setPopupAlertOn(!popupAlertOn)} />
+              <Text style={styles.dropdownText}>
+                Pop-up alert for bad posture
+              </Text>
+              <ToggleSwitch
+                isOn={popupAlertOn}
+                onToggle={() => setPopupAlertOn(!popupAlertOn)}
+              />
               <View style={styles.leftBorder2} />
             </View>
             <View style={styles.dropdownItem}>
               <Text style={styles.dropdownText}>Reminders to Stand</Text>
-              <ToggleSwitch isOn={remindersOn} onToggle={handleRemindersToggle} />
+              <ToggleSwitch
+                isOn={remindersOn}
+                onToggle={handleRemindersToggle}
+              />
               <View style={styles.leftBorder2} />
             </View>
             {remindersOn && (
               <View style={styles.dropdownItem}>
                 <Text style={styles.dropdownText2}>Notify every</Text>
-                <TouchableOpacity style={styles.timeButton} onPress={() => setModalVisible(true)}>
+                <TouchableOpacity
+                  style={styles.timeButton}
+                  onPress={() => setModalVisible(true)}
+                >
                   <Text style={styles.timeButtonText}>{selectedTime}</Text>
                 </TouchableOpacity>
               </View>
             )}
           </View>
         )}
-        <TouchableOpacity style={styles.settingsItem} onPress={() => toggleExpand('help')}>
+        <TouchableOpacity
+          style={styles.settingsItem}
+          onPress={() => toggleExpand("help")}
+        >
           <View style={styles.settingsItemContent}>
             <Image
-              source={require('../../assets/images/help.png')}
+              source={require("../../assets/images/help.png")}
               style={styles.helpIcon}
             />
             <Text style={styles.settingsText}>Help</Text>
             <Image
-              source={expandedItem === 'help' ? require('../../assets/images/downA.png') : require('../../assets/images/rightA.png')}
+              source={
+                expandedItem === "help"
+                  ? require("../../assets/images/downA.png")
+                  : require("../../assets/images/rightA.png")
+              }
               style={styles.arrowIcon}
             />
           </View>
-          {expandedItem !== 'help' && <View style={styles.leftBorder} />}
+          {expandedItem !== "help" && <View style={styles.leftBorder} />}
         </TouchableOpacity>
-        {expandedItem === 'help' && (
+        {expandedItem === "help" && (
           <View style={styles.dropdownContent}>
             <View style={styles.dropdownItem}>
               <Text style={styles.dropdownText}>Email</Text>
-              <TouchableOpacity><Text style={styles.emailText}>posturecorrector@gmail.com</Text></TouchableOpacity>
+              <TouchableOpacity>
+                <Text style={styles.emailText}>posturecorrector@gmail.com</Text>
+              </TouchableOpacity>
             </View>
           </View>
         )}
         <TouchableOpacity style={styles.settingsItem1} onPress={handleLogout}>
           <View style={styles.settingsItemContent}>
             <Image
-              source={require('../../assets/images/log.png')}
+              source={require("../../assets/images/log.png")}
               style={styles.logIcon}
             />
             <Text style={styles.settingsText}>Log Out</Text>
             <Image
-              source={require('../../assets/images/rightA.png')}
+              source={require("../../assets/images/rightA.png")}
               style={styles.arrowIcon}
             />
           </View>
         </TouchableOpacity>
       </Animated.View>
+
+      <TouchableOpacity
+          style={styles.notificationButton}
+          onPress={sendNotification}
+        >
+          <Text style={styles.notificationButtonText}>Send Notification</Text>
+      </TouchableOpacity>
 
       {/* Modal for time selection */}
       <Modal
@@ -237,12 +359,19 @@ const SettingsScreen = () => {
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Select Time</Text>
-            {['1 min', '5 min', '10 min', '15 min'].map((time) => (
-              <TouchableOpacity key={time} style={styles.modalOption} onPress={() => handleTimeSelect(time)}>
+            {["1 min", "5 min", "10 min", "15 min"].map((time) => (
+              <TouchableOpacity
+                key={time}
+                style={styles.modalOption}
+                onPress={() => handleTimeSelect(time)}
+              >
                 <Text style={styles.modalOptionText}>{time}</Text>
               </TouchableOpacity>
             ))}
-            <TouchableOpacity style={styles.modalCloseButton} onPress={() => setModalVisible(false)}>
+            <TouchableOpacity
+              style={styles.modalCloseButton}
+              onPress={() => setModalVisible(false)}
+            >
               <Text style={styles.modalCloseButtonText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -253,30 +382,42 @@ const SettingsScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  notificationButton: {
+    backgroundColor: "F9F9EE",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  notificationButtonText: {
+    color: "#F9F9EE",
+    fontSize: 18,
+    fontWeight: "600",
+  },
   container: {
     flex: 1,
-    backgroundColor: '#F9F9EE',
+    backgroundColor: "#F9F9EE",
   },
   scrollContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingTop: 50,
     paddingBottom: 20,
   },
   title: {
     fontSize: 32,
-    fontWeight: '700',
-    color: '#404040',
+    fontWeight: "700",
+    color: "#404040",
     marginBottom: 14,
-    marginTop: '8%',
+    marginTop: "8%",
   },
   profileSection: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center', // Center the content horizontally
-    backgroundColor: '#404040DE',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center", // Center the content horizontally
+    backgroundColor: "#404040DE",
     borderRadius: 40,
     padding: 15,
-    width: '86%',
+    width: "86%",
     height: 105, // Fixed height
     marginBottom: 20,
   },
@@ -285,31 +426,31 @@ const styles = StyleSheet.create({
     height: 52,
     borderRadius: 25,
     marginBottom: 0,
-    left: '10%',
+    left: "10%",
   },
   profileInfo: {
     flex: 1,
-    alignItems: 'center', // Center the profile info horizontally
+    alignItems: "center", // Center the profile info horizontally
     // left: '-5%',
   },
   profileName: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 27,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 3,
   },
   editButton: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 50,
     marginTop: 15, // Reduced marginTop to shrink the gap
-    width: '58%',
+    width: "58%",
   },
   editButtonContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center', // Center the content horizontally
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center", // Center the content horizontally
     height: 30,
   },
   pencilIcon: {
@@ -323,9 +464,9 @@ const styles = StyleSheet.create({
   //   fontSize: 14,
   // },
   settingsOptions: {
-    backgroundColor: '#404040DE',
+    backgroundColor: "#404040DE",
     borderRadius: 40,
-    width: '88%',
+    width: "88%",
     paddingVertical: 15,
     marginTop: 8,
   },
@@ -333,116 +474,116 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 25,
     // borderBottomWidth: 1,
-    borderBottomColor: '#878787',
-    position: 'relative', // Ensure the left border is positioned correctly
+    borderBottomColor: "#878787",
+    position: "relative", // Ensure the left border is positioned correctly
   },
   settingsItem1: {
     paddingVertical: 15,
     paddingHorizontal: 25,
-    position: 'relative', // Ensure the left border is positioned correctly
+    position: "relative", // Ensure the left border is positioned correctly
   },
   settingsItemContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between', // Space between the icon-text and the arrow
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between", // Space between the icon-text and the arrow
     marginBottom: -5,
   },
   deviceIcon: {
     width: 28,
     height: 28,
     marginRight: 15,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   bellIcon: {
     width: 28,
     height: 28,
     marginRight: 15,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   helpIcon: {
     width: 28,
     height: 28,
     marginRight: 15,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   logIcon: {
     width: 28,
     height: 28,
     marginRight: 15,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   arrowIcon: {
     width: 20,
     height: 20,
-    resizeMode: 'contain',
-    left: '-4%',
+    resizeMode: "contain",
+    left: "-4%",
   },
   settingsText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 22,
-    fontWeight: '500',
+    fontWeight: "500",
     flex: 1, // Allow text to take up remaining space
   },
   leftBorder: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 72,
-    width: '89%', // Adjust this value to control the length of the left border
+    width: "89%", // Adjust this value to control the length of the left border
     borderBottomWidth: 1,
-    borderBottomColor: '#878787',
+    borderBottomColor: "#878787",
   },
   leftBorder2: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 2,
-    width: '98%', // Adjust this value to control the length of the left border
+    width: "98%", // Adjust this value to control the length of the left border
     borderBottomWidth: 1,
-    borderBottomColor: '#878787',
+    borderBottomColor: "#878787",
   },
   dropdownContent: {
     paddingVertical: 5,
     paddingHorizontal: 25,
-    backgroundColor: 'transparent', // Match the background color of settingsOptions
+    backgroundColor: "transparent", // Match the background color of settingsOptions
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
-    overflow: 'hidden', // Ensure content is clipped to the bounds of the container
-    left: '4%',
+    overflow: "hidden", // Ensure content is clipped to the bounds of the container
+    left: "4%",
   },
   dropdownItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    left: '-5%',
+    flexDirection: "row",
+    alignItems: "center",
+    left: "-5%",
   },
   dropdownText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
     paddingVertical: 5,
     marginBottom: 4,
     marginTop: 4,
   },
   dropdownText2: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
     paddingVertical: 5,
     marginBottom: 4,
     marginTop: 4,
-    left: '8%',
+    left: "8%",
   },
   checkIcon: {
     width: 20,
     height: 20,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     marginLeft: 7, // Add some space between the text and the check icon
   },
   disclosureIcon: {
     width: 13,
     height: 13,
-    resizeMode: 'contain',
+    resizeMode: "contain",
     marginLeft: 7, // Add some space between the text and the check icon
   },
   toggleSwitch: {
@@ -450,22 +591,22 @@ const styles = StyleSheet.create({
     height: 31,
     borderRadius: 100,
     padding: 3,
-    justifyContent: 'center',
-    left: '-5%',
+    justifyContent: "center",
+    left: "-5%",
   },
   toggleSwitchOn: {
-    backgroundColor: '#34C759',
-    alignItems: 'flex-end',
+    backgroundColor: "#34C759",
+    alignItems: "flex-end",
   },
   toggleSwitchOff: {
-    backgroundColor: '#0000001F',
-    alignItems: 'flex-start',
+    backgroundColor: "#0000001F",
+    alignItems: "flex-start",
   },
   toggleCircle: {
     width: 27,
     height: 27,
     borderRadius: 100,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   toggleCircleOn: {
     transform: [{ translateX: 1 }],
@@ -474,8 +615,8 @@ const styles = StyleSheet.create({
     transform: [{ translateX: 0 }],
   },
   sliderContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   slider: {
     width: 220,
@@ -486,39 +627,39 @@ const styles = StyleSheet.create({
     height: 17,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: 'white',
+    borderColor: "white",
     marginHorizontal: 15,
   },
   filledCircle: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   timeButton: {
-    backgroundColor: '#1B1F26B8',
+    backgroundColor: "#1B1F26B8",
     paddingVertical: 5,
     paddingHorizontal: 10,
     borderRadius: 6,
     marginLeft: 0,
-    left: '-5%',
+    left: "-5%",
   },
   timeButtonText: {
-    color: '#007AFF',
+    color: "#007AFF",
     fontSize: 16,
   },
   modalContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContent: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 10,
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 20,
   },
   modalOption: {
@@ -526,10 +667,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginVertical: 5,
     borderRadius: 5,
-    backgroundColor: '#1B1F26B8',
+    backgroundColor: "#1B1F26B8",
   },
   modalOptionText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
   },
   modalCloseButton: {
@@ -537,18 +678,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginVertical: 5,
     borderRadius: 5,
-    backgroundColor: '#FF3B30',
+    backgroundColor: "#FF3B30",
     marginTop: 20,
   },
   modalCloseButtonText: {
-    color: 'white',
+    color: "white",
     fontSize: 16,
   },
   emailText: {
     color: "#58ACFF",
-    textDecorationLine: 'underline',
-    left: '-51%',
-  }
+    textDecorationLine: "underline",
+    left: "-51%",
+  },
 });
 
 export default SettingsScreen;
