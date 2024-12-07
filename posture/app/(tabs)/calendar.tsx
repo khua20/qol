@@ -114,6 +114,17 @@ const PostureInsightsScreen = () => {
         <Text style={styles.breakdownTitle}>Monthly</Text>
         <Text style={styles.breakdownTitle}>Breakdown</Text>
       </View>
+      <Text style={styles.percentage}>% of Good Posture</Text>
+      <Text style={styles.percentage1}>0%</Text>
+      <Text style={styles.percentage2}>25%</Text>
+      <Text style={styles.percentage3}>50%</Text>
+      <Text style={styles.percentage4}>75%</Text>
+      <Text style={styles.percentage5}>100%</Text>
+      <View style={styles.box}></View>
+      <View style={styles.box2}></View>
+      <View style={styles.box3}></View>
+      <View style={styles.box4}></View>
+      <View style={styles.box5}></View>
       <Image source={require('../../assets/images/lines.png')} style={styles.graphImage} />
       <View style={styles.monthsContainer}>
         {monthsAbbreviated.map((month, index) => (
@@ -149,6 +160,96 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F9F9EE',
     padding: 15,
+  },
+  box: {
+    width: 8,
+    height: 90,
+    backgroundColor: '#000',
+    position: 'absolute',
+    top: 160,
+    left: 53,
+  },
+  box2: {
+    width: 8,
+    height: 50,
+    backgroundColor: '#000',
+    position: 'absolute',
+    top: 200,
+    left: 78,
+  },
+  box3: {
+    width: 8,
+    height: 30,
+    backgroundColor: '#000',
+    position: 'absolute',
+    top: 220,
+    left: 103
+  },
+  box4: {
+    width: 8,
+    height: 10,
+    backgroundColor: '#000',
+    position: 'absolute',
+    top: 240,
+    left: 128
+  },
+  box5: {
+    width: 8,
+    height: 80,
+    backgroundColor: '#000',
+    position: 'absolute',
+    top: 170,
+    left: 153
+  },
+  percentage: {
+    fontSize: 10,
+    fontWeight: '400',
+    color: '#000',
+    textAlign: 'center', // Center the text horizontally
+    position: 'absolute', // Position the text absolutely within the card
+    transform: [{ rotate: '-90deg' }], // Rotate the text 90 degrees
+    left: -25, // Adjust this value to move the text to the left
+    top: 200, // Adjust this value to move the text up
+  },
+  percentage1: {
+    position: 'absolute',
+    fontSize: 6,
+    fontWeight: '400',
+    color: '#000',
+    top: 245,
+    left: 38,
+  },
+  percentage2: {
+    position: 'absolute',
+    fontSize: 6,
+    fontWeight: '400',
+    color: '#000',
+    top: 230,
+    left: 34,
+  },
+  percentage3: {
+    position: 'absolute',
+    fontSize: 6,
+    fontWeight: '400',
+    color: '#000',
+    top: 200,
+    left: 33,
+  },
+  percentage4: {
+    position: 'absolute',
+    fontSize: 6,
+    fontWeight: '400',
+    color: '#000',
+    top: 170,
+    left: 33,
+  },
+  percentage5: {
+    position: 'absolute',
+    fontSize: 6,
+    fontWeight: '400',
+    color: '#000',
+    top: 155,
+    left: 30,
   },
   scrollContainer: {
     paddingBottom: 20,
@@ -247,9 +348,6 @@ const styles = StyleSheet.create({
     margin: 3.7,
   },
   breakdownCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
     backgroundColor: '#B9D8D5',
     paddingVertical: 104, // Increase vertical padding to change height
     paddingHorizontal: 20, // Keep horizontal padding the same
